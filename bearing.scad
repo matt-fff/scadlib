@@ -49,7 +49,7 @@ module bearingHolder(
 // For the midside 22mm ball bearings
 bearingHolder(
     depth=8,
-    innerDiam=8.12,
-    outerDiam=22.1,
+    innerDiam=8.35,
+    outerDiam=22.05,
     coverThick=0.75
 );

@@ -10,7 +10,7 @@ module screwTest() {
         union() {
             // m2
             left(width * 0.35)union(){
-                cyl(d=2.4, h=depth);
+                cyl(d=2.2, h=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(7)
@@ -21,7 +21,7 @@ module screwTest() {
             }
             // m2.5
             left(width * 0.12)union(){
-                cyl(d=3, h=depth);
+                cyl(d=2.7, h=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(10.5)
@@ -32,7 +32,7 @@ module screwTest() {
             }
             // m3
             right(width * 0.05)union(){
-                cyl(d=3.3, h=depth);
+                cyl(d=3.2, h=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(7.5)
@@ -54,7 +54,7 @@ module screwTest() {
             }
             // m5
             right(width * 0.43)union(){
-                cyl(d=5.2, h=depth);
+                cyl(d=5, h=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(8.5)
@@ -226,7 +226,6 @@ module nutTest() {
 
 
 
-
-//screwTest();
-//fwd(10)insertTest();
-back(10)xrot(-90)nutTest();
+screwTest();
+//fwd(13)insertTest();
+//back(10)xrot(-90)nutTest();
