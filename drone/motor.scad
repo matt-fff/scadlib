@@ -47,7 +47,7 @@ module airHoles(height) {
 module motorMount(
     motorDiam=28,
     shellThickness=1.5,
-    shellLip=6,
+    shellLip=5,
     wireWidth=7,
 ){
     doubleThick = shellThickness * 2;
