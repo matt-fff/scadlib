@@ -1,25 +1,18 @@
-include <BOSL2/std.scad>
+include <BOSL2/std.scad>;
+use <scadlib/screws.scad>;
 
-module m3Hole(height) {
-    cyl(
-        d=3.4,
-        h=height,
-        anchor=BOTTOM
-    );
-}
-
-module screwHoles(height) {
+module screwHoles(height, anchor=CENTER) {
     width1 = (13 + 18.5) / 2;
     width2 = (16 + 21.5) / 2;
     fwd(width1/2)
-        m3Hole(height);
+        m3Hole(height, selfCut=false, anchor=anchor);
     back(width1/2)
-        m3Hole(height);
+        m3Hole(height, selfCut=false, anchor=anchor);
     zrot(90)union() {
         fwd(width2/2)
-            m3Hole(height);
+            m3Hole(height, selfCut=false, anchor=anchor);
         back(width2/2)
-            m3Hole(height);
+            m3Hole(height, selfCut=false, anchor=anchor);
     }
 }
 
@@ -79,7 +72,7 @@ module motorMount(
             down(shellThickness)union() {
                 // m3 screw holes
                 zrot(-45)
-                    screwHoles(shellThickness);
+                    screwHoles(shellThickness, anchor=BOTTOM);
                 // air holes
                 airHoles(shellThickness);
             }
