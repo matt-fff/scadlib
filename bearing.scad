@@ -2,54 +2,54 @@ use <BOSL2/std.scad>
 
 module bearing(
     depth,
-    innerDiam,
-    outerDiam,
+    inner_diam,
+    outer_diam,
     chamfer=0.25
 ){
     difference(){
         cyl(
-            d=outerDiam,
+            d=outer_diam,
             h=depth, 
             chamfer=chamfer
         );
         cyl(
-            d=innerDiam,
+            d=inner_diam,
             h=depth,
             chamfer=-chamfer
         );
     }
 }
 
-module bearingHolder(
+module bearing_holder(
     depth,
-    innerDiam,
-    outerDiam,
-    coverThick
+    inner_diam,
+    outer_diam,
+    cover_thick
 ) {
-    halfDiam = (innerDiam + outerDiam)/2;
+    half_diam = (inner_diam + outer_diam)/2;
     difference(){
-        down(coverThick)
-        cyl(h=coverThick + depth, d=outerDiam + (coverThick * 2));
+        down(cover_thick)
+        cyl(h=cover_thick + depth, d=outer_diam + (cover_thick * 2));
         union(){
             bearing(
-                depth=depth + coverThick,
-                innerDiam=innerDiam,
-                outerDiam=outerDiam
+                depth=depth + cover_thick,
+                inner_diam=inner_diam,
+                outer_diam=outer_diam
             );
-            down(depth/2 + coverThick)
+            down(depth/2 + cover_thick)
             bearing(
-                depth=coverThick + 1,
-                innerDiam=halfDiam * 0.75,
-                outerDiam=halfDiam * 1.25
+                depth=cover_thick + 1,
+                inner_diam=half_diam * 0.75,
+                outer_diam=half_diam * 1.25
             );
         }
     }
 }
 
 // For the midside 22mm ball bearings
-bearingHolder(
+bearing_holder(
     depth=8,
-    innerDiam=8.35,
-    outerDiam=22.05,
-    coverThick=0.75
+    inner_diam=8.35,
+    outer_diam=22.05,
+    cover_thick=0.75
 );

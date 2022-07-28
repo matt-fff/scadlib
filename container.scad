@@ -2,72 +2,72 @@ module container(
     width,
     depth,
     height,
-    wallWidth
+    wall_width
 ){
 
     difference(){
         cube([width, depth, height]);
         translate([
-            wallWidth,
-            wallWidth,  
-            wallWidth]
+            wall_width,
+            wall_width,  
+            wall_width]
         )cube(
           [
-            width - 2 * wallWidth,
-            depth - 2 * wallWidth,
+            width - 2 * wall_width,
+            depth - 2 * wall_width,
             height
           ]
         );
     }
 }
 
-function inchToMm(inches) = inches * 25.4;
+function inch_to_mm(inches) = inches * 25.4;
 
-width = inchToMm(3.0);
-depth = inchToMm(3.75);
+width = inch_to_mm(3.0);
+depth = inch_to_mm(3.75);
 height = 70;
-wallWidth = inchToMm(0.07);
+wall_width = inch_to_mm(0.07);
 
 container(
     width,
     depth,
     height,
-    wallWidth
+    wall_width
 );
 
 scale = 0.985;
 /*
 translate([
-    wallWidth * scale,
-    wallWidth * scale,
-    -wallWidth]
+    wall_width * scale,
+    wall_width * scale,
+    -wall_width]
 )cube([
-    width - 2 * wallWidth,
-    depth - 2 * wallWidth,
-    wallWidth
+    width - 2 * wall_width,
+    depth - 2 * wall_width,
+    wall_width
 ]);*/
 
-bottomWidth = (width - 2 * wallWidth);
+bottom_width = (width - 2 * wall_width);
 
-bottomDepth = (depth - 2 * wallWidth);
+bottom_depth = (depth - 2 * wall_width);
 
 translate([
-    wallWidth,
-    wallWidth,
-    -wallWidth]
+    wall_width,
+    wall_width,
+    -wall_width]
 )polyhedron(
   [
-  [ bottomWidth * (1-scale),
-    bottomDepth * (1-scale),
+  [ bottom_width * (1-scale),
+    bottom_depth * (1-scale),
     0
   ],  //0
-  [ bottomWidth * scale,  bottomDepth * (1-scale),  0 ],  //1
-  [ bottomWidth * scale,  bottomDepth * scale,  0 ],  //2
-  [  bottomWidth * (1-scale),  bottomDepth * scale,  0 ],  //3
-  [  0,  0,  wallWidth ],  //4
-  [ bottomWidth,  0,  wallWidth ],  //5
-  [ bottomWidth,  bottomDepth,  wallWidth ],  //6
-  [  0,  bottomDepth,  wallWidth ]],
+  [ bottom_width * scale,  bottom_depth * (1-scale),  0 ],  //1
+  [ bottom_width * scale,  bottom_depth * scale,  0 ],  //2
+  [  bottom_width * (1-scale),  bottom_depth * scale,  0 ],  //3
+  [  0,  0,  wall_width ],  //4
+  [ bottom_width,  0,  wall_width ],  //5
+  [ bottom_width,  bottom_depth,  wall_width ],  //6
+  [  0,  bottom_depth,  wall_width ]],
   
   [[0,1,2,3],  // bottom
   [4,5,1,0],  // front

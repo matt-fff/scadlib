@@ -2,7 +2,13 @@ include <BOSL2/std.scad>;
 use <scadlib/screws.scad>;
 
 
-module screwTab(thickness, width, height) {
+module screw_tab(
+    thickness,
+    width,
+    height,
+    anchor=CENTER,
+    edges=EDGES_ALL
+) {
     difference(){
         cuboid(
             [
@@ -10,67 +16,71 @@ module screwTab(thickness, width, height) {
                 height,
                 width,
             ],
-            anchor=BOTTOM,
+            anchor=anchor,
             rounding=0.5,
-            except=BACK
+            edges=edges
         );
         up(width/2)
         yrot(90)
-            m25Hole(thickness);
+            m25_hole(thickness);
     }
 }
 
-module speedController(
+module speed_controller(
     width,
     height,
     depth=9,
-    shellThickness=1.5,
-    capacitorHeight=12,
-    wireWidth=22,
-    wireDepth=6,
-    screwTabs=false
+    shell_thickness=1.5,
+    capacitor_height=12,
+    wire_width=22,
+    wire_depth=6,
+    screw_tabs=false
 ) {
-    doubleThick = 2 * shellThickness;
-    if (screwTabs) {
-        tabHeight = 8;
-        tabWidth = 7;
+    double_thick = 2 * shell_thickness;
+    if (screw_tabs) {
+        tab_height = 8;
+        tab_width = 7;
         
         // capacitor tabs
-        fwd((height + tabHeight)/2 - 1)
-        up(shellThickness + (depth - tabWidth) / 2)
+        fwd((height + tab_height)/2 - 1)
+        up(shell_thickness + (depth - tab_width) / 2)
         union(){
-            left((width + shellThickness)/2)
-                screwTab(
-                    shellThickness,
-                    tabWidth,
-                    tabHeight
+            left((width + shell_thickness)/2)
+                screw_tab(
+                    shell_thickness,
+                    tab_width,
+                    tab_height,
+                    anchor=BOTTOM
                 );
-            right((width + shellThickness)/2)
-                screwTab(
-                    shellThickness,
-                    tabWidth,
-                    tabHeight
+            right((width + shell_thickness)/2)
+                screw_tab(
+                    shell_thickness,
+                    tab_width,
+                    tab_height,
+                    anchor=BOTTOM
                 );
         }
         
-        tabHeight = 7;
-        tabWidth = 9;
+        tab_height = 7;
+        tab_width = 9;
         
         // motor tabs
-        back((height - tabHeight)/2 + shellThickness)
-        down(depth - shellThickness - 1)
+        back((height - tab_height)/2 + shell_thickness)
+        down(depth - shell_thickness - 1)
         union(){
-            left((width + shellThickness)/2)
-                screwTab(
-                    shellThickness,
-                    tabWidth,
-                    tabHeight
+            left((width + shell_thickness)/2)
+                screw_tab(
+                    shell_thickness,
+                    tab_width,
+                    tab_height,
+                    anchor=BOTTOM
                 );
-            right((width + shellThickness)/2)
-                screwTab(
-                    shellThickness,
-                    tabWidth,
-                    tabHeight
+            right((width + shell_thickness)/2)
+                screw_tab(
+                    shell_thickness,
+                    tab_width,
+                    tab_height,
+                    anchor=BOTTOM
                 );
         }
         
@@ -80,16 +90,16 @@ module speedController(
         // shell
         cuboid(
             [
-                doubleThick + width,
-                doubleThick + height,
-                doubleThick + depth
+                double_thick + width,
+                double_thick + height,
+                double_thick + depth
             ],
             anchor=BOTTOM,
             except=BACK,
             rounding=2
         );
         union() {
-            up(shellThickness)union() {
+            up(shell_thickness)union() {
                 // controller void
                 cuboid(
                     [width, height, depth],
@@ -97,13 +107,13 @@ module speedController(
                     chamfer=1
                 );
                 // wire void
-                back(shellThickness * 2)
-                up((depth - wireDepth) / 2)
+                back(shell_thickness * 2)
+                up((depth - wire_depth) / 2)
                 cuboid(
                     [
-                        wireWidth,
+                        wire_width,
                         height,
-                        wireDepth
+                        wire_depth
                     ],
                     anchor=BOTTOM,
                     rounding=2
@@ -111,19 +121,19 @@ module speedController(
                 // label window
                 back((height / 2) - 10)up(depth)
                 cuboid(
-                    [width, 6, shellThickness],
+                    [width, 6, shell_thickness],
                     anchor=BOTTOM+BACK,
                     edges="Z",
                     rounding=1
                 );
             }
             // capacitor void
-            fwd(capacitorHeight * 2)
+            fwd(capacitor_height * 2)
             cuboid(
                 [
                     width,
-                    capacitorHeight * 2,
-                    doubleThick + depth
+                    capacitor_height * 2,
+                    double_thick + depth
                 ],
                 anchor=BOTTOM,
                 chamfer=2
@@ -133,4 +143,4 @@ module speedController(
     }
 }
 
-xrot(-90)speedController(27, 50, screwTabs=true);
+xrot(-90)speed_controller(27, 50, screw_tabs=true);

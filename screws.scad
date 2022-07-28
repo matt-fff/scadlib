@@ -1,7 +1,7 @@
 include <BOSL2/std.scad>;
 
-module m2Hole(height, selfCut=true, anchor=CENTER) {
-    diam = (selfCut) ? 2.2 : 3;
+module m2_hole(height, self_cut=true, anchor=CENTER) {
+    diam = (self_cut) ? 2.2 : 3;
     cyl(
         d=diam,
         h=height,
@@ -9,8 +9,8 @@ module m2Hole(height, selfCut=true, anchor=CENTER) {
     );
 }
 
-module m25Hole(height, selfCut=true, anchor=CENTER) {
-    diam = (selfCut) ? 2.7 : 3.5;
+module m25_hole(height, self_cut=true, anchor=CENTER) {
+    diam = (self_cut) ? 2.7 : 3.5;
     cyl(
         d=diam,
         h=height,
@@ -18,8 +18,8 @@ module m25Hole(height, selfCut=true, anchor=CENTER) {
     );
 }
 
-module m3Hole(height, selfCut=true, anchor=CENTER) {
-    diam = (selfCut) ? 3.2 : 4;
+module m3_hole(height, self_cut=true, anchor=CENTER) {
+    diam = (self_cut) ? 3.2 : 4;
     cyl(
         d=diam,
         h=height,
@@ -27,8 +27,8 @@ module m3Hole(height, selfCut=true, anchor=CENTER) {
     );
 }
 
-module m4Hole(height, selfCut=true, anchor=CENTER) {
-    diam = (selfCut) ? 4.2 : 5;
+module m4_hole(height, self_cut=true, anchor=CENTER) {
+    diam = (self_cut) ? 4.2 : 5;
     cyl(
         d=diam,
         h=height,
@@ -36,8 +36,8 @@ module m4Hole(height, selfCut=true, anchor=CENTER) {
     );
 }
 
-module m5Hole(height, selfCut=true, anchor=CENTER) {
-    diam = (selfCut) ? 5 : 6;
+module m5_hole(height, self_cut=true, anchor=CENTER) {
+    diam = (self_cut) ? 5 : 6;
     cyl(
         d=diam,
         h=height,
@@ -45,7 +45,7 @@ module m5Hole(height, selfCut=true, anchor=CENTER) {
     );
 }
 
-module m2CaptiveNut(height, inset=2, anchor=CENTER) {
+module m2_captive_nut(height, inset=2, anchor=CENTER) {
     width = 4.5;
     cuboid(
         [width, width + inset + 1.5, height],
@@ -53,7 +53,7 @@ module m2CaptiveNut(height, inset=2, anchor=CENTER) {
     );
 }
 
-module m25CaptiveNut(height, inset=2, anchor=CENTER) {
+module m25_captive_nut(height, inset=2, anchor=CENTER) {
     width = 5.5;
     cuboid(
         [width, width + inset + 1.5, height],
@@ -61,7 +61,7 @@ module m25CaptiveNut(height, inset=2, anchor=CENTER) {
     );
 }
 
-module m3CaptiveNut(height, inset=2, anchor=CENTER) {
+module m3_captive_nut(height, inset=2, anchor=CENTER) {
     width = 6.5;
     cuboid(
         [width, width + inset + 1.5, height],
@@ -69,7 +69,7 @@ module m3CaptiveNut(height, inset=2, anchor=CENTER) {
     );
 }
 
-module m4CaptiveNut(height, inset=2, anchor=CENTER) {
+module m4_captive_nut(height, inset=2, anchor=CENTER) {
     width = 7.5;
     cuboid(
         [width, width + inset + 1.5, height],
@@ -77,7 +77,7 @@ module m4CaptiveNut(height, inset=2, anchor=CENTER) {
     );
 }
 
-module m5CaptiveNut(height, inset=2, anchor=CENTER) {
+module m5_captive_nut(height, inset=2, anchor=CENTER) {
     width = 9;
     cuboid(
         [width, width + inset + 1.5, height],
@@ -86,7 +86,7 @@ module m5CaptiveNut(height, inset=2, anchor=CENTER) {
 }
 
 // for metric screws to self-cut threads
-module screwTest() {
+module screw_test() {
     depth = 5;
     height = 7;
     width = 55;
@@ -95,7 +95,7 @@ module screwTest() {
         union() {
             // m2
             left(width * 0.35)union(){
-                m2Hole(height=depth);
+                m2_hole(height=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(7)
@@ -106,7 +106,7 @@ module screwTest() {
             }
             // m2.5
             left(width * 0.12)union(){
-                m25Hole(height=depth);
+                m25_hole(height=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(10.5)
@@ -117,7 +117,7 @@ module screwTest() {
             }
             // m3
             right(width * 0.05)union(){
-                m3Hole(height=depth);
+                m3_hole(height=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(7.5)
@@ -128,7 +128,7 @@ module screwTest() {
             }
             // m4
             right(width * 0.23)union(){
-                m4Hole(height=depth);
+                m4_hole(height=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(8)
@@ -139,7 +139,7 @@ module screwTest() {
             }
             // m5
             right(width * 0.43)union(){
-                m5Hole(height=depth);
+                m5_hole(height=depth);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(8.5)
@@ -156,7 +156,7 @@ module screwTest() {
 
 
 // for metric screw inserts (hilitchi)
-module insertTest() {
+module insert_test() {
     depth = 10;
     height = 10;
     width = 50;
@@ -213,7 +213,7 @@ module insertTest() {
 
 
 // for testing captive metric screw nuts
-module nutTest() {
+module nut_test() {
     depth = 5;
     height = 9;
     width = 60;
@@ -222,7 +222,7 @@ module nutTest() {
         union() {
             // m2
             left(width * 0.36)union(){
-                m2Hole(height=depth, selfCut=false);
+                m2_hole(height=depth, self_cut=false);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(7)
@@ -232,12 +232,12 @@ module nutTest() {
                 );
                 inset = 2;
                 height = 1.65;
-                fwd(inset)m2CaptiveNut(height, inset);
+                fwd(inset)m2_captive_nut(height, inset);
                 
             }
             // m2.5
             left(width * 0.14)union(){
-                m25Hole(height=depth, selfCut=false);
+                m25_hole(height=depth, self_cut=false);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(10.5)
@@ -247,11 +247,11 @@ module nutTest() {
                 );
                 inset = 2;
                 height = 2;
-                fwd(inset)m25CaptiveNut(height, inset);
+                fwd(inset)m25_captive_nut(height, inset);
             }
             // m3
             right(width * 0.035)union(){
-                m3Hole(height=depth, selfCut=false);
+                m3_hole(height=depth, self_cut=false);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(7.5)
@@ -261,11 +261,11 @@ module nutTest() {
                 );
                 inset = 2;
                 height = 2.7;
-                fwd(inset)m3CaptiveNut(height, inset);
+                fwd(inset)m3_captive_nut(height, inset);
             }
             // m4
             right(width * 0.22)union(){
-                m4Hole(height=depth, selfCut=false);
+                m4_hole(height=depth, self_cut=false);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(8)
@@ -275,11 +275,11 @@ module nutTest() {
                 );
                 inset = 3;
                 height = 3;
-                fwd(inset)m4CaptiveNut(height, inset);
+                fwd(inset)m4_captive_nut(height, inset);
             }
             // m5
             right(width * 0.41)union(){
-                m5Hole(height=depth, selfCut=false);
+                m5_hole(height=depth, self_cut=false);
                 up(depth * 0.5 - 1)
                 fwd(1)
                 left(8.5)
@@ -289,19 +289,19 @@ module nutTest() {
                 );
                 inset = 3;
                 height = 3.3;
-                fwd(inset)m5CaptiveNut(height, inset);
+                fwd(inset)m5_captive_nut(height, inset);
             }
         }
     }
 }
 
-module screwDemo() {
-    screwTest();
-    fwd(13)insertTest();
-    back(10)xrot(-90)nutTest();
+module screw_demo() {
+    screw_test();
+    fwd(13)insert_test();
+    back(10)xrot(-90)nut_test();
 }
 
-screwDemo();
+screw_demo();
 
 
 
