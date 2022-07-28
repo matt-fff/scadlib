@@ -69,7 +69,7 @@ module m3_captive_nut(height, inset=2, anchor=CENTER) {
     );
 }
 
-module m4_captive_nut(height, inset=2, anchor=CENTER) {
+module m4_captive_nut(height, inset=3, anchor=CENTER) {
     width = 7.5;
     cuboid(
         [width, width + inset + 1.5, height],
@@ -77,7 +77,7 @@ module m4_captive_nut(height, inset=2, anchor=CENTER) {
     );
 }
 
-module m5_captive_nut(height, inset=2, anchor=CENTER) {
+module m5_captive_nut(height, inset=3, anchor=CENTER) {
     width = 9;
     cuboid(
         [width, width + inset + 1.5, height],
