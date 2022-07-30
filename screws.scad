@@ -297,12 +297,8 @@ module nut_test() {
 
 module screw_demo() {
     screw_test();
-    fwd(13)insert_test();
-    back(10)xrot(-90)nut_test();
+    fwd(25)insert_test();
+    back(25)zrot(180)xrot(-9)nut_test();
 }
 
 screw_demo();
-
-
-
-
