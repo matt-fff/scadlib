@@ -48,7 +48,7 @@ module bearing_guide(
 
 bearing_guide(
     depth=7,
-    inner_diam=7,
+    inner_diam=12,
     outer_diam=21.95,
     cover_thick=1.5,
     guide_edge_offset=5
