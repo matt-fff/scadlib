@@ -100,7 +100,7 @@ down(100)
 pieces(15) X(span(200))
   Y(vRepeat(0,10,30,70))
     color(vRepeat(red,green,blue,cyan))
-      ball(15);
+      ball(15);`
 
 // Mirror ball pieces across X
 up(50)
