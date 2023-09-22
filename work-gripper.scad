@@ -12,36 +12,62 @@ pad_inset = -(
         (pad_depth * 2)
     ) / 2;
     
-module pad() {
-    tex = texture("trunc_pyramids_vnf");
-    cyl(
-        h=pad_depth,
-        r=pad_diam/2,
-        rounding=pad_rounding,
-        texture="trunc_pyramids_vnf",
-        tex_size=[1,1],
-        tex_style="concave"
-    );
-//    rotate_sweep(
-//        circle(d=pad_diam),
-//        h=pad_depth,
-//        tex_size=[1,1]
-//    );
+module pad(
+    textured=true,
+    core_void_diam=pad_diam/4,
+    tex_inset=1,
+) {
+    if (textured) {
+        tex_size = 4;
+        tex = texture(
+            "trunc_pyramids_vnf",
+            inset=0.3
+        );
+        rgn = [
+            right(
+                core_void_diam/2,
+                p=rect(
+                    [
+                        pad_diam/2 - core_void_diam/2,
+                        pad_depth
+                    ],
+                    anchor=LEFT
+                )
+            )
+        ];
+
+        rotate_sweep(
+            rgn, texture=tex,
+            tex_size=[tex_size, tex_size],
+            tex_inset=tex_inset,
+            tex_rot=true,
+            angle=360
+        );
+    } else {
+        tube(
+            h=pad_depth,
+            id=core_void_diam,
+            od=pad_diam
+        );
+    }
 }
 
-module pads() {
+module pads(
+    textured=true,
+) {
     // top pad
     up(depth / 2 - pad_inset)
-    pad();
+    pad(textured=textured);
 
     // bottom pad
     down(depth / 2 - pad_inset)
-    pad();
+    pad(textured=textured);
 }
 
 // core
 //difference() {
 //    cyl(d=core_diam, h=core_depth, rounding=4);
-//    pads();
+//    pads(textured=false);
 //}
-pads();
+//pads();
+pad();
