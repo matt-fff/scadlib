@@ -41,13 +41,16 @@ module kick_plate(
     height=kick_height,
     width=tot_width,
     thickness=carcas_thickness,
-    kick_inset=inches_to_mm(3)
-){
-    Y(thickness)
-    union() {
-        // Runners
+    kick_inset=inches_to_mm(3),
+    left_exposed=false,
+    right_exposed=false
+){ 
+    TORIGHT()
+    g(
+        Y(thickness),
         TOFRONT()
-        TORIGHT()
+    ) {
+        // Runners
         pieces(2)
         Y(span(depth - kick_inset))
         box(
@@ -78,9 +81,8 @@ module frame_outline(
     brace_width=brace_width,
     col=yellow
 ){
-    
     clear(col)
-    union() {
+    g() {
         stack(TOUP)
         TOREAR()
         TORIGHT()
@@ -98,7 +100,9 @@ module frame_outline(
             y=depth - thickness,
             h=height - thickness
         );
-        
+    }
+    opaq(col)
+    g(){
         // Back Braces
         TOREAR()
         TORIGHT()
@@ -154,15 +158,15 @@ module frame_storage(
         (dado_depth - carcas_thickness)*2
     );
     
-    echo(divider_depth);
     
-    Y(
-        panel_thickness + 
-        carcas_thickness
-    ) 
-    TOREAR()
     TORIGHT()
-    union(){
+    g(
+        TOREAR(),
+        Y(
+            panel_thickness + 
+            carcas_thickness
+        )
+    ){
         //
         // SIDE HORIZONTAL DIVIDERS
         //
@@ -223,7 +227,6 @@ module back_panel(
         x=width + (dado_depth - carcas_thickness)*2,
         h=height + dado_depth - carcas_thickness*2
     );
-
 }
 
 module face_plate_outline(
@@ -235,10 +238,11 @@ module face_plate_outline(
     carcas_thickness=carcas_thickness,
     division_width=tot_width / 3
 ){
-    Y(depth - carcas_thickness)
-    TOREAR()
     TORIGHT()
-    union(){
+    g(
+        Y(depth - carcas_thickness),
+        TOREAR()
+    ){
         //
         // FRAME OUTLINE
         //
@@ -315,10 +319,11 @@ module face_plate_storage(
     division_width=tot_width / 3,
     drawer_height=drawer_height
 ){
-    Y(depth - carcas_thickness)
-    TOREAR()
     TORIGHT()
-    union(){
+    g(
+        Y(depth - carcas_thickness),
+        TOREAR()
+    ){
         //
         // SIDE HORIZONTAL DIVIDERS
         //
@@ -396,121 +401,68 @@ module carcas(
     col1 = pink;
     col2 = red;
     col3 = orange;
+    col_loop = vRepeat(col1, col2, col3);
 
-    TODOWN()
-    union() {
-        clear(col1)
-        kick_plate(
-            depth=depth,
-            height=kick_height,
-            width=division_width
-        );
-        
-        clear(col2)
-        X(division_width)
-        kick_plate(
-            depth=depth,
-            height=kick_height,
-            width=division_width
-        );
-        
-        clear(col3)
-        X(division_width * 2)
+    g(TODOWN()) {
+        pieces(3)
+        clear(vRepeat(col1, col2, col3))
+        X(division_width * vRepeat(0, 1, 2))
         kick_plate(
             depth=depth,
             height=kick_height,
             width=division_width
         );
     }
-    TOUP()
-    union() {
-        union() {
-            back_panel(
-                height=(
-                    height - 
-                    kick_height -
-                    top_thickness
-                ),
-                width=division_width,
-                carcas_thickness=carcas_thickness,
-                col=col1
-            );
-            frame_outline(
-                depth=depth,
-                height=(
-                    height - 
-                    kick_height -
-                    top_thickness
-                ),
-                width=division_width,
-                col=col1
-            );
+    
+    assemble()
+    {
+        add()
+        g(TOUP()) {
+            pieces(3)
+            X(division_width * vRepeat(0, 1, 2))
+            assemble() {
+                add()
+                frame_outline(
+                    depth=depth,
+                    height=(
+                        height - 
+                        kick_height -
+                        top_thickness
+                    ),
+                    width=division_width,
+                    col=vRepeat(col1, col2, col3)
+                );
+                addRemove()
+                back_panel(
+                    height=(
+                        height - 
+                        kick_height -
+                        top_thickness
+                    ),
+                    width=division_width,
+                    carcas_thickness=carcas_thickness,
+                    col=vRepeat(col1, col2, col3)
+                );
+            }
         }
-        
-        X(division_width)
-        union() {
-            back_panel(
-                height=(
-                    height - 
-                    kick_height -
-                    top_thickness
-                ),
-                width=division_width,
-                carcas_thickness=carcas_thickness,
-                col=col2
-            );
-            frame_outline(
-                depth=depth,
-                height=(
-                    height - 
-                    kick_height -
-                    top_thickness
-                ),
-                width=division_width,
-                col=col2
-            );
-        }
-
-        X(division_width * 2)
-        union() {
-            back_panel(
-                height=(
-                    height - 
-                    kick_height -
-                    top_thickness
-                ),
-                width=division_width,
-                carcas_thickness=carcas_thickness,
-                col=col3
-            );
-            frame_outline(
-                depth=depth,
-                height=(
-                    height - 
-                    kick_height -
-                    top_thickness
-                ),
-                width=division_width,
-                col=col3
-            );
-        }
+        clear(black)
+        addRemove()
+        frame_storage(
+            depth=depth,
+            height=(
+                height -
+                kick_height -
+                top_thickness
+            ),
+            width=width,
+            face_thickness=face_thickness,
+            face_width=face_width,
+            carcas_thickness=carcas_thickness,
+            division_width=division_width,
+            dado_depth=dado_depth,
+            panel_thickness=panel_thickness
+        );
     }
-    clear(black)
-    frame_storage(
-        depth=depth,
-        height=(
-            height -
-            kick_height -
-            top_thickness
-        ),
-        width=width,
-        face_thickness=face_thickness,
-        face_width=face_width,
-        carcas_thickness=carcas_thickness,
-        division_width=division_width,
-        dado_depth=dado_depth,
-        panel_thickness=panel_thickness
-    );
     
     clear()
     face_plate_outline(
@@ -540,6 +492,110 @@ module carcas(
         carcas_thickness=carcas_thickness,
         division_width=division_width
     );
+}
+
+module drawer(
+    depth=inches_to_mm(15),
+    height=drawer_height,
+    width=tot_width/3 - carcas_thickness*2,
+    width_gap=4,
+    height_gap=20,
+    bottom_recess=13,
+    thickness=carcas_thickness,
+) {
+    pieces(2)
+    X(span(width-width_gap))
+    box(
+        depth,
+        x=thickness,
+        h=height-height_gap
+    );
+}
+
+module drawers(
+    depth=tot_depth,
+    height=tot_height - kick_height - top_thickness,
+    width=tot_width,
+    face_width=face_width,
+    face_thickness=face_thickness,
+    carcas_thickness=carcas_thickness,
+    division_width=tot_width / 3,
+    drawer_height=drawer_height,
+    dado_depth=dado_depth,
+    panel_thickness=panel_thickness
+){
+    // from drawer slide specs
+    // min top clearance = 6mm
+    // min bottom clearance (omitting recess) = 14mm
+    // min INTERIOR width_gap = 42;
+    // The specs are pretty idiotic in how they lay it out
+    width_gap = 42 - (carcas_thickness * 2);
+    height_gap = 20;
+    bottom_recess = 13;
+    
+    
+    drawer_depth = (
+        depth - 
+        carcas_thickness -
+        panel_thickness -
+        face_thickness
+    );
+    
+    drawer_width = (
+        division_width -
+        max(face_width, carcas_thickness*2)
+    );
+    
+    g(
+        Y(
+            panel_thickness + 
+            carcas_thickness
+        ),
+        TOREAR(),
+        TORIGHT()
+    ){
+        //
+        // SIDE HORIZONTAL DIVIDERS
+        //
+        
+        g(
+            Z(
+                height - 
+                drawer_height/2
+            ),
+            X(carcas_thickness)
+        ){
+        // Right Horizontal Divider
+        drawer(
+            depth=drawer_depth,
+            height=drawer_height,
+            width=drawer_width
+        );
+//        // Left Horizontal Divider
+//        X(division_width*2)
+//        drawer(
+//            depth=drawer_depth,
+//            height=drawer_height,
+//            width=drawer_width
+//        );
+        }
+        
+        //
+        // CENTER HORIZONTAL DIVIDERS
+        //
+        
+//        Z(drawer_height/2)
+//        X(division_width +  carcas_thickness)
+//        drawer(
+//            depth=drawer_depth,
+//            height=drawer_height,
+//            width=drawer_width,
+//            width_gap=width_gap,
+//            height_gap=height_gap,
+//            bottom_recess=bottom_recess,
+//            thickness=carcas_thickness
+//        );
+    }
 }
 
 module top(
@@ -572,6 +628,8 @@ carcas(
     panel_thickness=panel_thickness,
     dado_depth=dado_depth
 );
+//clear(orange)
+//drawers();
 clear()
 Z(
     tot_height -
