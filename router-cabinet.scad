@@ -2,26 +2,76 @@ include <constructive/constructive-compiled.scad>
 
 // Function to convert inches to millimeters
 function inches_to_mm(inches) = inches * 25.4;
+function mm_to_inches(mm) = mm / 25.4;
+module log_dims(dimensions) {
+    echo(str("dimensions: ", str(dimensions)));
+}
+
+module logbox(
+    side=10,
+    x=undef,
+    y=undef,
+    z=undef,
+    h=heightInfo(),
+    part=undef,
+    subpart=undef,
+    material=undef,
+    count=1
+) {
+    // Copied from box module.
+    z=(z==undef)?h:z;
+    lx=(x==undef?side:x);
+    ly=(y==undef?side:y);
+    lz=(z==undef?side:z);
+    
+    dimensions = [
+        part,
+        subpart, 
+        material, 
+        lx,
+        ly,
+        lz,
+        count
+    ];
+    assert(len(dimensions) == len(dimension_header));
+    log_dims(dimensions);
+    box(side=side, x=x, y=y, z=z, h=h);
+    children();
+}
+dimension_header = [
+    "part",
+    "subpart",
+    "material",
+    "lx", 
+    "ly", 
+    "lz", 
+    "count"
+];
+log_dims(dimension_header);
 
 tot_width = inches_to_mm(72);
 tot_height = inches_to_mm(39);
 tot_depth = inches_to_mm(18.5);
 
+carcas_material = "3/4 plywood";
 carcas_thickness = inches_to_mm(0.75);
 brace_width = inches_to_mm(3.125);
 
+top_material = "3/4 top";
 top_thickness = inches_to_mm(0.75);
 top_overhang = inches_to_mm(0.75);
 
+face_material = "3/4 hardwood";
 face_thickness = inches_to_mm(0.75);
 face_width = carcas_thickness * 2;
 
 kick_height = inches_to_mm(3.5);
 drawer_height = inches_to_mm(9);
 
-
+panel_material = "1/4 plywood";
 panel_thickness = inches_to_mm(0.25);
 dado_depth = inches_to_mm(0.25);
+
 
 //module drawer_slide(
 //    depth=inches_to_mm(15.51),
@@ -36,6 +86,7 @@ dado_depth = inches_to_mm(0.25);
 //}
 
 
+
 module kick_plate(
     depth=tot_depth,
     height=kick_height,
@@ -44,7 +95,10 @@ module kick_plate(
     kick_inset=inches_to_mm(3),
     left_exposed=false,
     right_exposed=false
-){ 
+){
+    part = "kick_plate";
+    material = carcas_material;
+
     TORIGHT()
     g(
         Y(thickness),
@@ -53,22 +107,29 @@ module kick_plate(
         // Runners
         pieces(2)
         Y(span(depth - kick_inset))
-        box(
+        logbox(
             thickness,
             x=width,
-            h=height
+            h=height,
+            part=part,
+            material=material,
+            subpart="runner"
         );
         
+        side_width = depth - kick_inset - thickness;
         // Sides
         TOFRONT()
         TORIGHT()
         pieces(2)
         X(span(width - thickness))
         turnXY(90)
-        box(
+        logbox(
             thickness,
-            x=depth - kick_inset - thickness,
-            h=height
+            x=side_width,
+            h=height,
+            part=part,
+            material=material,
+            subpart="side"
         );
     }
 }
@@ -81,24 +142,32 @@ module frame_outline(
     brace_width=brace_width,
     col=yellow
 ){
+    part = "frame_outline";
+    material = carcas_material;
     clear(col)
     g() {
         stack(TOUP)
         TOREAR()
         TORIGHT()
         // Bottom
-        box(
+        logbox(
             width,
             y=depth - thickness,
-            h=thickness
+            h=thickness,
+            part=part,
+            material=material,
+            subpart="bottom"
         )
         // Sides
         pieces(2)
         X(span(width - thickness))
-        box(
-            thickness,
+        logbox(
+            x=thickness,
             y=depth - thickness,
-            h=height - thickness
+            h=height - thickness,
+            part=part,
+            material=material,
+            subpart="side"
         );
     }
     opaq(col)
@@ -111,10 +180,13 @@ module frame_outline(
             height - brace_width - thickness
         ))
         X(thickness)
-        box(
+        logbox(
             thickness,
             x=width-thickness*2,
-            h=brace_width
+            h=brace_width,
+            part=part,
+            material=material,
+            subpart="back_brace"
         );
 
         // Top Braces
@@ -126,10 +198,13 @@ module frame_outline(
             depth - brace_width - thickness
         ))
         X(thickness)
-        box(
+        logbox(
             brace_width,
             x=width-thickness*2,
-            h=thickness
+            h=thickness,
+            part=part,
+            material=material,
+            subpart="top_brace"
         );
     }
 }
@@ -146,6 +221,9 @@ module frame_storage(
     dado_depth=dado_depth,
     panel_thickness=panel_thickness
 ){
+    part = "frame_storage";
+    material = carcas_material;
+    
     divider_depth = (
         depth - 
         carcas_thickness -
@@ -178,17 +256,23 @@ module frame_storage(
         )
         X(carcas_thickness - dado_depth)
         // Right Horizontal Divider
-        box(
+        logbox(
             divider_depth,
             x=divider_width,
-            h=carcas_thickness
+            h=carcas_thickness,
+            part=part,
+            material=material,
+            subpart="right_divider"
         )
         // Left Horizontal Divider
         X(division_width*2)
-        box(
+        logbox(
             divider_depth,
             x=divider_width,
-            h=carcas_thickness
+            h=carcas_thickness,
+            part=part,
+            material=material,
+            subpart="left_divider"
         );
         
         //
@@ -198,10 +282,13 @@ module frame_storage(
         Z((face_width-carcas_thickness)/2)
         X(division_width + face_width/2 - dado_depth)
         Z(drawer_height*2)
-        box(
+        logbox(
             divider_depth,
             x=divider_width,
-            h=carcas_thickness
+            h=carcas_thickness,
+            part=part,
+            material=material,
+            subpart="center_divider"
         );
     }
 }
@@ -214,7 +301,9 @@ module back_panel(
     dado_depth=dado_depth,
     col=black
 ){
-    
+    material = panel_material;
+    part = "back_panel";
+
     // Back Panel
     clear(col)
     Z(carcas_thickness-dado_depth)
@@ -222,10 +311,13 @@ module back_panel(
     TORIGHT()
     X(carcas_thickness - dado_depth)
     Y(carcas_thickness)
-    box(
+    logbox(
         panel_thickness,
         x=width + (dado_depth - carcas_thickness)*2,
-        h=height + dado_depth - carcas_thickness*2
+        h=height + dado_depth - carcas_thickness*2,
+        part=part,
+        material=material,
+        subpart="panel"
     );
 }
 
@@ -238,6 +330,9 @@ module face_plate_outline(
     carcas_thickness=carcas_thickness,
     division_width=tot_width / 3
 ){
+    material = face_material;
+    part = "face_plate_outline";
+
     TORIGHT()
     g(
         Y(depth - carcas_thickness),
@@ -249,33 +344,45 @@ module face_plate_outline(
         
         X(carcas_thickness*2)
         // Bottom
-        box(
+        logbox(
             face_thickness,
             x=width - carcas_thickness*4,
-            h=face_width
+            h=face_width,
+            part=part,
+            material=material,
+            subpart="bottom"
         )
         // Top
         Z(height - carcas_thickness)
-        box(
+        logbox(
             face_thickness,
             x=width - carcas_thickness*4,
-            h=face_width
+            h=face_width,
+            part=part,
+            material=material,
+            subpart="top"
         );
         
         
         Z((height - carcas_thickness)/2)
         // Right
-        box(
+        logbox(
             face_thickness,
             x=face_width,
-            h=height + carcas_thickness
+            h=height + carcas_thickness,
+            part=part,
+            material=material,
+            subpart="right"
         )
         // Left
         X(width - face_width)
-        box(
+        logbox(
             face_thickness,
             x=face_width,
-            h=height + carcas_thickness
+            h=height + carcas_thickness,
+            part=part,
+            material=material,
+            subpart="left"
         );
         
         //
@@ -285,25 +392,31 @@ module face_plate_outline(
         Z((height - carcas_thickness)/2)
         // Right Vertical Divider
         X(division_width - carcas_thickness)
-        box(
+        logbox(
             face_thickness,
             x=face_width,
             h=(
                 height - 
                 face_width - 
                 carcas_thickness
-            )
+            ),
+            part=part,
+            material=material,
+            subpart="right_divider"
         )
         // Left Vertical Divider
         X(division_width)
-        box(
+        logbox(
             face_thickness,
             x=face_width,
             h=(
                 height - 
                 face_width - 
                 carcas_thickness
-            )
+            ),
+            part=part,
+            material=material,
+            subpart="left_divider"
         );
 
     }
@@ -319,6 +432,8 @@ module face_plate_storage(
     division_width=tot_width / 3,
     drawer_height=drawer_height
 ){
+    material = face_material;
+    part = "face_plate_storage";
     TORIGHT()
     g(
         Y(depth - carcas_thickness),
@@ -335,25 +450,31 @@ module face_plate_storage(
         )
         X(face_width)
         // Right Horizontal Divider
-        box(
+        logbox(
             face_thickness,
             x=(
                 division_width - 
                 face_width - 
                 carcas_thickness
             ),
-            h=face_width
+            h=face_width,
+            part=part,
+            material=material,
+            subpart="right_divider"
         )
         // Left Horizontal Divider
         X(division_width*2 - face_width/2)
-        box(
+        logbox(
             face_thickness,
             x=(
                 division_width - 
                 face_width - 
                 carcas_thickness
             ),
-            h=face_width
+            h=face_width,
+            part=part,
+            material=material,
+            subpart="left_divider"
         );
         
         //
@@ -362,23 +483,29 @@ module face_plate_storage(
         
         X(division_width + face_width/2)
         Z(drawer_height)
-        box(
+        logbox(
             face_thickness,
             x=(
                 division_width - 
                 face_width
             ),
-            h=face_width
+            h=face_width,
+            part=part,
+            material=material,
+            subpart="center_divider"
         )
         // Bottom Horizontal Divider
         Z(drawer_height)
-        box(
+        logbox(
             face_thickness,
             x=(
                 division_width - 
                 face_width
             ),
-            h=face_width
+            h=face_width,
+            part=part,
+            material=material,
+            subpart="center_divider"
         );
     }
 }
@@ -503,12 +630,17 @@ module drawer(
     bottom_recess=13,
     thickness=carcas_thickness,
 ) {
+    part = "drawer";
+
     pieces(2)
     X(span(width - width_gap - thickness*2))
-    box(
+    logbox(
         depth,
         x=thickness,
-        h=height-height_gap
+        h=height-height_gap,
+        part=part,
+        material=carcas_material,
+        subpart="side"
     );
 }
 
@@ -618,14 +750,19 @@ module top(
     thickness=top_thickness,
     overhang=top_overhang
 ){
+    material = top_material;
+    part = "top";
     X(-overhang)
     Y(-overhang)
     TOREAR()
     TORIGHT()
-    box(
+    logbox(
         depth + overhang*2,
         x=width + overhang*2,
-        h=top_thickness
+        h=top_thickness,
+        part=part,
+        material=material,
+        subpart="top"
     );
 }
 
@@ -655,3 +792,4 @@ Z(
     thickness=top_thickness,
     overhang=top_overhang
 );
+
