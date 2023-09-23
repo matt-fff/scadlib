@@ -504,7 +504,7 @@ module drawer(
     thickness=carcas_thickness,
 ) {
     pieces(2)
-    X(span(width-width_gap))
+    X(span(width - width_gap - thickness*2))
     box(
         depth,
         x=thickness,
@@ -514,7 +514,12 @@ module drawer(
 
 module drawers(
     depth=tot_depth,
-    height=tot_height - kick_height - top_thickness,
+    height=(
+        tot_height -
+        kick_height -
+        top_thickness -
+        carcas_thickness
+    ),
     width=tot_width,
     face_width=face_width,
     face_thickness=face_thickness,
@@ -530,9 +535,10 @@ module drawers(
     // min INTERIOR width_gap = 42;
     // The specs are pretty idiotic in how they lay it out
     width_gap = 42 - (carcas_thickness * 2);
-    height_gap = 20;
+    bottom_gap = 14;
+    top_gap = 6;
+    height_gap = bottom_gap + top_gap;
     bottom_recess = 13;
-    
     
     drawer_depth = (
         depth - 
@@ -560,17 +566,22 @@ module drawers(
         
         g(
             Z(
-                height - 
+                height -
+                top_gap - 
                 drawer_height/2
             ),
             X(carcas_thickness)
         ){
-        // Right Horizontal Divider
-        drawer(
-            depth=drawer_depth,
-            height=drawer_height,
-            width=drawer_width
-        );
+//            // Right Horizontal Divider
+//            drawer(
+//                depth=drawer_depth,
+//                height=drawer_height,
+//                width=drawer_width,
+//                width_gap=width_gap,
+//                height_gap=height_gap,
+//                bottom_recess=bottom_recess,
+//                thickness=carcas_thickness
+//            );
 //        // Left Horizontal Divider
 //        X(division_width*2)
 //        drawer(
@@ -584,17 +595,20 @@ module drawers(
         // CENTER HORIZONTAL DIVIDERS
         //
         
-//        Z(drawer_height/2)
-//        X(division_width +  carcas_thickness)
-//        drawer(
-//            depth=drawer_depth,
-//            height=drawer_height,
-//            width=drawer_width,
-//            width_gap=width_gap,
-//            height_gap=height_gap,
-//            bottom_recess=bottom_recess,
-//            thickness=carcas_thickness
-//        );
+        Z(drawer_height/2)
+        X(
+            // TODO I don't think this is right
+            division_width + carcas_thickness*2
+        )
+        drawer(
+            depth=drawer_depth,
+            height=drawer_height,
+            width=drawer_width,
+            width_gap=width_gap,
+            height_gap=height_gap,
+            bottom_recess=bottom_recess,
+            thickness=carcas_thickness
+        );
     }
 }
 
@@ -628,8 +642,8 @@ carcas(
     panel_thickness=panel_thickness,
     dado_depth=dado_depth
 );
-//clear(orange)
-//drawers();
+clear(orange)
+drawers();
 clear()
 Z(
     tot_height -
