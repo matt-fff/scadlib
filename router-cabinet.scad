@@ -16,7 +16,8 @@ module logbox(
     part=undef,
     subpart=undef,
     material=undef,
-    count=1
+    count=1,
+    should_log=true
 ) {
     // Copied from box module.
     z=(z==undef)?h:z;
@@ -34,7 +35,7 @@ module logbox(
         count
     ];
     assert(len(dimensions) == len(dimension_header));
-    log_dims(dimensions);
+    if (should_log) log_dims(dimensions);
     box(side=side, x=x, y=y, z=z, h=h);
     children();
 }
@@ -132,6 +133,7 @@ module kick_plate(
             subpart="side"
         );
     }
+    children();
 }
 
 module frame_outline(
@@ -145,10 +147,8 @@ module frame_outline(
     part = "frame_outline";
     material = carcas_material;
     clear(col)
-    g() {
-        stack(TOUP)
-        TOREAR()
-        TORIGHT()
+    TORIGHT()
+    g(TOREAR(), stack(TOUP)) {
         // Bottom
         logbox(
             width,
@@ -157,9 +157,10 @@ module frame_outline(
             part=part,
             material=material,
             subpart="bottom"
-        )
+        );
         // Sides
         pieces(2)
+        Z(thickness)
         X(span(width - thickness))
         logbox(
             x=thickness,
@@ -170,6 +171,19 @@ module frame_outline(
             subpart="side"
         );
     }
+    children();
+}
+
+module frame_braces(
+    depth=tot_depth,
+    height=tot_height - kick_height - top_thickness,
+    width=tot_width,
+    thickness=carcas_thickness,
+    brace_width=brace_width,
+    col=yellow
+){
+    part = "frame_braces";
+    material = carcas_material;
     opaq(col)
     g(){
         // Back Braces
@@ -186,7 +200,7 @@ module frame_outline(
             h=brace_width,
             part=part,
             material=material,
-            subpart="back_brace"
+            subpart="back"
         );
 
         // Top Braces
@@ -204,9 +218,10 @@ module frame_outline(
             h=thickness,
             part=part,
             material=material,
-            subpart="top_brace"
+            subpart="top"
         );
     }
+    children();
 }
 
 module frame_storage(
@@ -291,6 +306,7 @@ module frame_storage(
             subpart="center_divider"
         );
     }
+    children();
 }
 
 module back_panel(
@@ -299,7 +315,8 @@ module back_panel(
     carcas_thickness=carcas_thickness,
     panel_thickness=panel_thickness,
     dado_depth=dado_depth,
-    col=black
+    col=black,
+    should_log=true
 ){
     material = panel_material;
     part = "back_panel";
@@ -317,8 +334,10 @@ module back_panel(
         h=height + dado_depth - carcas_thickness*2,
         part=part,
         material=material,
-        subpart="panel"
+        subpart="panel",
+        should_log=should_log
     );
+    children();
 }
 
 module face_plate_outline(
@@ -420,6 +439,7 @@ module face_plate_outline(
         );
 
     }
+    children();
 }
 
 module face_plate_storage(
@@ -508,6 +528,7 @@ module face_plate_storage(
             subpart="center_divider"
         );
     }
+    children();
 }
 
 module carcas(
@@ -540,7 +561,50 @@ module carcas(
             width=division_width
         );
     }
-    
+    g(TOUP()) {
+        clear(gray)
+        pieces(3)
+        X(division_width * vRepeat(0, 1, 2))
+        frame_braces(
+            depth=depth,
+            height=(
+                height - 
+                kick_height -
+                top_thickness
+            ),
+            width=division_width,
+            col=vRepeat(col1, col2, col3)
+        )
+        // Add the actual back panel
+        back_panel(
+            height=(
+                height - 
+                kick_height -
+                top_thickness
+            ),
+            width=division_width,
+            carcas_thickness=carcas_thickness,
+            col=vRepeat(col1, col2, col3),
+            should_log=true
+        );
+        
+    }
+    clear(gray)
+    frame_storage(
+        depth=depth,
+        height=(
+            height -
+            kick_height -
+            top_thickness
+        ),
+        width=width,
+        face_thickness=face_thickness,
+        face_width=face_width,
+        carcas_thickness=carcas_thickness,
+        division_width=division_width,
+        dado_depth=dado_depth,
+        panel_thickness=panel_thickness
+    );
     assemble()
     {
         add()
@@ -559,21 +623,19 @@ module carcas(
                     width=division_width,
                     col=vRepeat(col1, col2, col3)
                 );
-                addRemove()
+                // Hollow out a channel for the panel
+                remove()
                 back_panel(
-                    height=(
-                        height - 
-                        kick_height -
-                        top_thickness
-                    ),
+                    height=height, // intentionally large
                     width=division_width,
                     carcas_thickness=carcas_thickness,
-                    col=vRepeat(col1, col2, col3)
+                    col=vRepeat(col1, col2, col3),
+                    should_log=false
                 );
             }
         }
-        clear(black)
-        addRemove()
+        // Hollow out a channel for the shelves
+        remove()
         frame_storage(
             depth=depth,
             height=(
@@ -619,6 +681,7 @@ module carcas(
         carcas_thickness=carcas_thickness,
         division_width=division_width
     );
+    children();
 }
 
 module drawer(
@@ -642,6 +705,7 @@ module drawer(
         material=carcas_material,
         subpart="side"
     );
+    children();
 }
 
 module drawers(
@@ -742,6 +806,7 @@ module drawers(
             thickness=carcas_thickness
         );
     }
+    children();
 }
 
 module top(
@@ -764,6 +829,7 @@ module top(
         material=material,
         subpart="top"
     );
+    children();
 }
 
 carcas(
