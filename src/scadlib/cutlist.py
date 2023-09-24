@@ -7,7 +7,7 @@ import json
 from collections import defaultdict
 from itertools import groupby
 from operator import itemgetter
-from typing import Optional, List, Any, Dict
+from typing import Optional, List, Any, Dict, Iterable
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
@@ -106,7 +106,7 @@ def consolidate_dimensions(dimensions: List[Dict[str, Any]]) -> List[Dict[str, A
     return grouped_dimensions
 
 
-def get_table(dimensions: List[Dict[str, Any]], metric: bool = False) -> Table:
+def get_table(dimensions: Iterable[Dict[str, Any]], metric: bool = False) -> Table:
     unit = "mm" if metric else "in"
     table = Table(title="Cut List", show_lines=True)
     table.add_column("Material", style="cyan")
@@ -150,6 +150,10 @@ def main(args: argparse.Namespace) -> None:
     console.print(f"Processing file: {file_path}")
     dimensions = get_dimensions(file_path)
     consolidated = consolidate_dimensions(dimensions)
+
+    if args.stock:
+        consolidated = filter(lambda row: row["material"] == args.stock, consolidated)
+
     table = get_table(consolidated)
     console.print(table)
 
@@ -162,6 +166,10 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "-f", "--file", type=str, help="The source openscad file for dimensions"
+    )
+
+    parser.add_argument(
+        "-s", "--stock", type=str, help="Filter based on stock material being used."
     )
 
     parser.add_argument(
