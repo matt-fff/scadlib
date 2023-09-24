@@ -106,15 +106,14 @@ def consolidate_dimensions(dimensions: List[Dict[str, Any]]) -> List[Dict[str, A
     return grouped_dimensions
 
 
-def get_table(dimensions: List[Dict[str, Any]]) -> Table:
+def get_table(dimensions: List[Dict[str, Any]], metric: bool = False) -> Table:
+    unit = "mm" if metric else "in"
     table = Table(title="Cut List", show_lines=True)
     table.add_column("Material", style="cyan")
-    table.add_column("X (mm)", style="magenta")
-    table.add_column("Y (mm)", style="green")
-    table.add_column("Z (mm)", style="yellow")
-    table.add_column("X (in)", style="magenta")
-    table.add_column("Y (in)", style="green")
-    table.add_column("Z (in)", style="yellow")
+
+    table.add_column(f"X ({unit})", style="magenta")
+    table.add_column(f"Y ({unit})", style="green")
+    table.add_column(f"Z ({unit})", style="yellow")
     table.add_column("Count", style="red")
     table.add_column("Parts", style="pink1")
 
@@ -124,14 +123,16 @@ def get_table(dimensions: List[Dict[str, Any]]) -> Table:
         part_counts = "\n".join(
             [f"{key}:{count}" for key, count in row["part_counts"].items()]
         )
+
+        dims = (row["lz"], row["lx"], row["ly"])
+        if not metric:
+            dims = tuple(mm_to_inches(dim) for dim in dims)
+
         table.add_row(
             row["material"],
-            f"{row['lz']:.2f}",
-            f"{row['lx']:.2f}",
-            f"{row['ly']:.2f}",
-            f"{mm_to_inches(row['lz']):.2f}",
-            f"{mm_to_inches(row['lx']):.2f}",
-            f"{mm_to_inches(row['ly']):.2f}",
+            f"{dims[0]:.4f}",
+            f"{dims[1]:.4f}",
+            f"{dims[2]:.4f}",
             str(row["count"]),
             part_counts,
         )
@@ -161,6 +162,14 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "-f", "--file", type=str, help="The source openscad file for dimensions"
+    )
+
+    parser.add_argument(
+        "-m",
+        "--metric",
+        default=False,
+        help="If true, will output data in millimeters",
+        action="store_true",
     )
 
     args = parser.parse_args()
