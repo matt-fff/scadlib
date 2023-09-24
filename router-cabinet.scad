@@ -106,32 +106,54 @@ module kick_plate(
         TOFRONT()
     ) {
         // Runners
-        pieces(2)
-        Y(span(depth - kick_inset))
+        X(thickness)
+        logbox(
+            thickness,
+            x=width - thickness*2,
+            h=height,
+            part=part,
+            material=material,
+            subpart="back_runner"
+        );
+        Y(depth - kick_inset)
         logbox(
             thickness,
             x=width,
             h=height,
             part=part,
             material=material,
-            subpart="runner"
+            subpart="front_runner"
         );
         
-        side_width = depth - kick_inset - thickness;
-        // Sides
-        TOFRONT()
-        TORIGHT()
-        pieces(2)
-        X(span(width - thickness))
-        turnXY(90)
-        logbox(
-            thickness,
-            x=side_width,
-            h=height,
-            part=part,
-            material=material,
-            subpart="side"
-        );
+        // TODO technically this is wrong.
+        // We make the sides oversized because
+        // exposed corners need to be mitered
+        side_width = depth - kick_inset;
+        left_width = side_width + (left_exposed ? thickness : 0);
+        right_width = side_width + (right_exposed ? thickness : 0);
+        
+        g(Y(-thickness)) {
+            // Sides
+            X(width - thickness)
+            turnXY(90)
+            logbox(
+                thickness,
+                x=left_width,
+                h=height,
+                part=part,
+                material=material,
+                subpart="left_side"
+            );
+            turnXY(90)
+            logbox(
+                thickness,
+                x=right_width,
+                h=height,
+                part=part,
+                material=material,
+                subpart="right_side"
+            );
+        }
     }
     children();
 }
@@ -558,7 +580,9 @@ module carcas(
         kick_plate(
             depth=depth,
             height=kick_height,
-            width=division_width
+            width=division_width,
+            right_exposed=vRepeat(true, false, false),
+            left_exposed=vRepeat(false, false, true)
         );
     }
     g(TOUP()) {
@@ -694,7 +718,19 @@ module drawer(
     thickness=carcas_thickness,
 ) {
     part = "drawer";
-
+    
+    // Face
+    Y(depth)
+    X(width/2)
+    logbox(
+        thickness,
+        x=width,
+        h=height,
+        part=part,
+        material=carcas_material,
+        subpart="side"
+    );
+    
     pieces(2)
     X(span(width - width_gap - thickness*2))
     logbox(
