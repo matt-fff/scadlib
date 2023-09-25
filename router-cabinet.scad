@@ -329,7 +329,7 @@ module frame_storage(
             part=part,
             material=material,
             subpart="center_divider",
-            should_log=should_log
+            should_log=should_
         );
     }
     children();
