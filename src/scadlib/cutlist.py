@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import tempfile
 import json
+from fractions import Fraction
 from collections import defaultdict
 from itertools import groupby
 from operator import itemgetter
@@ -106,6 +107,26 @@ def consolidate_dimensions(dimensions: List[Dict[str, Any]]) -> List[Dict[str, A
     return grouped_dimensions
 
 
+def fractionalize(number: float) -> str:
+    whole_part = int(number)
+    fractional_part = number - whole_part
+
+    # Create a Fraction object for the fractional part and limit the denominator
+    fraction = Fraction(fractional_part).limit_denominator()
+
+    # Construct the string representation
+    if whole_part and fraction:  # both whole and fractional parts are present
+        result = f"{whole_part} {fraction}"
+    elif whole_part:  # only the whole part is present
+        result = str(whole_part)
+    elif fraction:  # only the fractional part is present
+        result = str(fraction)
+    else:  # the number is zero
+        result = "0"
+
+    return result
+
+
 def get_table(dimensions: Iterable[Dict[str, Any]], metric: bool = False) -> Table:
     unit = "mm" if metric else "in"
     table = Table(title="Cut List", show_lines=True)
@@ -125,14 +146,14 @@ def get_table(dimensions: Iterable[Dict[str, Any]], metric: bool = False) -> Tab
         )
 
         dims = (row["lz"], row["lx"], row["ly"])
-        if not metric:
-            dims = tuple(mm_to_inches(dim) for dim in dims)
+        if metric:
+            dims = tuple(f"{dim:.4f}" for dim in dims)
+        else:
+            dims = tuple(fractionalize(mm_to_inches(dim)) for dim in dims)
 
         table.add_row(
             row["material"],
-            f"{dims[0]:.4f}",
-            f"{dims[1]:.4f}",
-            f"{dims[2]:.4f}",
+            *dims,
             str(row["count"]),
             part_counts,
         )

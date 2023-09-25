@@ -256,7 +256,8 @@ module frame_storage(
     division_width=tot_width / 3,
     drawer_height=drawer_height,
     dado_depth=dado_depth,
-    panel_thickness=panel_thickness
+    panel_thickness=panel_thickness,
+    should_log=true
 ){
     part = "frame_storage";
     material = carcas_material;
@@ -299,7 +300,8 @@ module frame_storage(
             h=carcas_thickness,
             part=part,
             material=material,
-            subpart="right_divider"
+            subpart="right_divider",
+            should_log=should_log
         )
         // Left Horizontal Divider
         X(division_width*2)
@@ -309,7 +311,8 @@ module frame_storage(
             h=carcas_thickness,
             part=part,
             material=material,
-            subpart="left_divider"
+            subpart="left_divider",
+            should_log=should_log
         );
         
         //
@@ -325,7 +328,8 @@ module frame_storage(
             h=carcas_thickness,
             part=part,
             material=material,
-            subpart="center_divider"
+            subpart="center_divider",
+            should_log=should_log
         );
     }
     children();
@@ -608,8 +612,7 @@ module carcas(
             ),
             width=division_width,
             carcas_thickness=carcas_thickness,
-            col=vRepeat(col1, col2, col3),
-            should_log=true
+            col=vRepeat(col1, col2, col3)
         );
         
     }
@@ -673,7 +676,8 @@ module carcas(
             carcas_thickness=carcas_thickness,
             division_width=division_width,
             dado_depth=dado_depth,
-            panel_thickness=panel_thickness
+            panel_thickness=panel_thickness,
+            should_log=false
         );
     }
     
@@ -881,8 +885,8 @@ carcas(
     panel_thickness=panel_thickness,
     dado_depth=dado_depth
 );
-clear(orange)
-drawers();
+//clear(orange)
+//drawers();
 clear()
 Z(
     tot_height -
