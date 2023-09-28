@@ -1,5 +1,5 @@
 include <BOSL2/std.scad>;
-use <scadlib/screws.scad>;
+use <scadlib/common/screws.scad>;
 
 module screw_holes(height, anchor=CENTER) {
     width1 = (13 + 18.5) / 2;

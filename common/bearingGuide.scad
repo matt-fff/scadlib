@@ -1,5 +1,5 @@
 use <BOSL2/std.scad>
-use <scadlib/bearing.scad>;
+use <scadlib/common/bearing.scad>;
 
 module bearing_guide(
     depth,

@@ -1,5 +1,5 @@
 include <BOSL2/std.scad>;
-use <scadlib/screws.scad>;
+use <scadlib/common/screws.scad>;
 
 
 module screw_tab(
