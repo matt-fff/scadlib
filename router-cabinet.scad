@@ -1,38 +1,35 @@
 include <constructive/constructive-compiled.scad>
-include <scadlib/common/cutlist.scad> 
+include <scadlib/common/cutlist.scad>
+include <scadlib/common/utils.scad>
 
-// Function to convert inches to millimeters
-function inches_to_mm(inches) = inches * 25.4;
-function mm_to_inches(mm) = mm / 25.4;
-
-tot_width = inches_to_mm(72);
-tot_height = inches_to_mm(39);
-tot_depth = inches_to_mm(18.5);
+tot_width = inch_to_mm(72);
+tot_height = inch_to_mm(39);
+tot_depth = inch_to_mm(18.5);
 
 carcas_material = "3/4 plywood";
-carcas_thickness = inches_to_mm(0.75);
-brace_width = inches_to_mm(3.125);
+carcas_thickness = inch_to_mm(0.75);
+brace_width = inch_to_mm(3.125);
 
 top_material = "3/4 top";
-top_thickness = inches_to_mm(0.75);
-top_overhang = inches_to_mm(0.75);
+top_thickness = inch_to_mm(0.75);
+top_overhang = inch_to_mm(0.75);
 
 face_material = "3/4 hardwood";
-face_thickness = inches_to_mm(0.75);
+face_thickness = inch_to_mm(0.75);
 face_width = carcas_thickness * 2;
 
-kick_height = inches_to_mm(3.5);
-drawer_height = inches_to_mm(9);
+kick_height = inch_to_mm(3.5);
+drawer_height = inch_to_mm(9);
 
 panel_material = "1/4 plywood";
-panel_thickness = inches_to_mm(0.25);
-dado_depth = inches_to_mm(0.25);
+panel_thickness = inch_to_mm(0.25);
+dado_depth = inch_to_mm(0.25);
 
 
 //module drawer_slide(
-//    depth=inches_to_mm(15.51),
-//    height=inches_to_mm(2.01),
-//    width=inches_to_mm(2.01)
+//    depth=inch_to_mm(15.51),
+//    height=inch_to_mm(2.01),
+//    width=inch_to_mm(2.01)
 //){
 //    box(
 //        height,
@@ -48,7 +45,7 @@ module kick_plate(
     height=kick_height,
     width=tot_width,
     thickness=carcas_thickness,
-    kick_inset=inches_to_mm(3),
+    kick_inset=inch_to_mm(3),
     left_exposed=false,
     right_exposed=false
 ){
@@ -668,7 +665,7 @@ module carcas(
 }
 
 module drawer(
-    depth=inches_to_mm(15),
+    depth=inch_to_mm(15),
     height=drawer_height,
     width=tot_width/3 - carcas_thickness*2,
     width_gap=4,
