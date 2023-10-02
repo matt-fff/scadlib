@@ -122,10 +122,11 @@ module frame_outline(
     material = carcas_material;
     clear(col)
     TORIGHT()
-    g(TOREAR(), stack(TOUP)) {
+    g(TOREAR()) {
         // Bottom
+        X(thickness)
         logbox(
-            width,
+            width - thickness*2,
             y=depth - thickness,
             h=thickness,
             part=part,
@@ -134,12 +135,11 @@ module frame_outline(
         );
         // Sides
         pieces(2)
-        Z(thickness)
         X(span(width - thickness))
         logbox(
             x=thickness,
             y=depth - thickness,
-            h=height - thickness,
+            h=height,
             part=part,
             material=material,
             subpart="side"
@@ -154,7 +154,8 @@ module frame_braces(
     width=tot_width,
     thickness=carcas_thickness,
     brace_width=brace_width,
-    col=yellow
+    col=yellow,
+    panel_thickness=panel_thickness
 ){
     part = "frame_braces";
     material = carcas_material;
@@ -165,7 +166,7 @@ module frame_braces(
         TORIGHT()
         pieces(2)
         Z(span(
-            height - brace_width - thickness
+            height - brace_width
         ))
         X(thickness)
         logbox(
@@ -181,9 +182,13 @@ module frame_braces(
         TOREAR()
         TORIGHT()
         Z(height - thickness)
+        Y(thickness + panel_thickness)
         pieces(2)
         Y(span(
-            depth - brace_width - thickness
+            depth - 
+            brace_width - 
+            thickness*2 - 
+            panel_thickness
         ))
         X(thickness)
         logbox(
@@ -309,7 +314,7 @@ module back_panel(
     logbox(
         panel_thickness,
         x=width + (dado_depth - carcas_thickness)*2,
-        h=height + dado_depth - carcas_thickness*2,
+        h=height + dado_depth - carcas_thickness,
         part=part,
         material=material,
         subpart="panel",
@@ -609,7 +614,9 @@ module carcas(
                     width=division_width,
                     carcas_thickness=carcas_thickness,
                     col=vRepeat(col1, col2, col3),
-                    should_log=false
+                    should_log=false,
+                    dado_depth=dado_depth,
+                    panel_thickness=panel_thickness
                 );
             }
         }
