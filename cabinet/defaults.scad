@@ -14,7 +14,8 @@ top_overhang = inch_to_mm(0.75);
 
 face_material = "3/4 hardwood";
 face_thickness = inch_to_mm(0.75);
-face_width = carcas_thickness * 2;
+face_width = carcas_thickness * 2.25;
+face_overlay = inch_to_mm(0.5);
 
 kick_height = inch_to_mm(3.5);
 drawer_height = inch_to_mm(9);

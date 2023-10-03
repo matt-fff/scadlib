@@ -9,36 +9,36 @@ module face_plate_outline(
     width=tot_width,
     face_thickness=face_thickness,
     face_width=face_width,
-    carcas_thickness=carcas_thickness,
     division_width=tot_width / 3
 ){
     material = face_material;
     part = "face_plate_outline";
+    rail_width = width - face_width*2;
 
     TORIGHT()
     g(
-        Y(depth - carcas_thickness),
+        Y(depth - face_width/2),
         TOREAR()
     ){
         //
         // FRAME OUTLINE
         //
         
-        X(carcas_thickness*2)
+        X(face_width)
         // Bottom
         logbox(
             face_thickness,
-            x=width - carcas_thickness*4,
+            x=rail_width,
             h=face_width,
             part=part,
             material=material,
             subpart="bottom"
         )
         // Top
-        Z(height - carcas_thickness)
+        Z(height - face_width/2)
         logbox(
             face_thickness,
-            x=width - carcas_thickness*4,
+            x=rail_width,
             h=face_width,
             part=part,
             material=material,
@@ -46,12 +46,12 @@ module face_plate_outline(
         );
         
         
-        Z((height - carcas_thickness)/2)
+        Z((height - face_width/2)/2)
         // Right
         logbox(
             face_thickness,
             x=face_width,
-            h=height + carcas_thickness,
+            h=height + face_width/2,
             part=part,
             material=material,
             subpart="right"
@@ -61,7 +61,7 @@ module face_plate_outline(
         logbox(
             face_thickness,
             x=face_width,
-            h=height + carcas_thickness,
+            h=height + face_width/2,
             part=part,
             material=material,
             subpart="left"
@@ -71,36 +71,21 @@ module face_plate_outline(
         // FRAME VERTICAL DIVIDERS
         //
         
-        Z((height - carcas_thickness)/2)
-        // Right Vertical Divider
-        X(division_width - carcas_thickness)
+        Z((height - face_width/2)/2)
+        X(division_width - face_width/2)
+        pieces(2)
+        X(span(division_width))
         logbox(
             face_thickness,
             x=face_width,
             h=(
                 height - 
-                face_width - 
-                carcas_thickness
+                face_width * 1.5
             ),
             part=part,
             material=material,
-            subpart="right_divider"
-        )
-        // Left Vertical Divider
-        X(division_width)
-        logbox(
-            face_thickness,
-            x=face_width,
-            h=(
-                height - 
-                face_width - 
-                carcas_thickness
-            ),
-            part=part,
-            material=material,
-            subpart="left_divider"
+            subpart=vRepeat("right_divider", "left_divider")
         );
-
     }
     children();
 }
@@ -111,7 +96,6 @@ module face_plate_storage(
     width=tot_width,
     face_width=face_width,
     face_thickness=face_thickness,
-    carcas_thickness=carcas_thickness,
     division_width=tot_width / 3,
     drawer_height=drawer_height
 ){
@@ -119,7 +103,7 @@ module face_plate_storage(
     part = "face_plate_storage";
     TORIGHT()
     g(
-        Y(depth - carcas_thickness),
+        Y(depth - face_width/2),
         TOREAR()
     ){
         //
@@ -128,7 +112,7 @@ module face_plate_storage(
         
         Z(
             height - 
-            carcas_thickness - 
+            face_width/2 - 
             drawer_height
         )
         X(face_width)
@@ -138,7 +122,7 @@ module face_plate_storage(
             x=(
                 division_width - 
                 face_width - 
-                carcas_thickness
+                face_width/2
             ),
             h=face_width,
             part=part,
@@ -152,7 +136,7 @@ module face_plate_storage(
             x=(
                 division_width - 
                 face_width - 
-                carcas_thickness
+                face_width/2
             ),
             h=face_width,
             part=part,

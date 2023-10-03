@@ -2,6 +2,8 @@ include <constructive/constructive-compiled.scad>
 include <scadlib/common/cutlist.scad>
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
+include <scadlib/cabinet/shaker.scad>
+
 
 module drawer_bottom(
     depth=inch_to_mm(15),
@@ -12,8 +14,9 @@ module drawer_bottom(
     should_log=true
 ){
     part = "drawer";
+    Y(shell_thickness)
     logbox(
-        depth + dado_depth - shell_thickness,
+        depth - shell_thickness*2 + dado_depth,
         x=width - (
           width_gap + 
           shell_thickness - 
@@ -41,8 +44,9 @@ module drawer(
     shell_material=carcas_material,
     face_thickness=face_thickness,
     face_trim_material=face_material,
-    face_interior_material=face_material,
-    bottom_material=panel_material
+    face_panel_material=face_material,
+    bottom_material=panel_material,
+    face_overlay=face_overlay
 ) {
     part = "drawer";
     height_gap = bottom_gap + top_gap;
@@ -115,6 +119,22 @@ module drawer(
           part=part,
           material=shell_material,
           subpart="side"
+      );
+
+      // Face
+      add()
+      Y(depth + 100)
+      X(width_gap - face_overlay)
+      shaker_face(
+        width=width,
+        height=height,
+        trim_thickness=face_thickness,
+        trim_width=face_width,
+        trim_material=face_trim_material,
+        trim_overlay=face_overlay,
+        panel_thickness=panel_thickness,
+        panel_material=face_panel_material,
+        part="drawer_face"
       );
     }
     children();
@@ -211,6 +231,7 @@ module drawers(
               shell_thickness=carcas_thickness,
               face_thickness=face_thickness
             );
+
         }
         
         //

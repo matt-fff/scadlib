@@ -140,7 +140,6 @@ module carcas(
         width=width,
         face_thickness=face_thickness,
         face_width=face_width,
-        carcas_thickness=carcas_thickness,
         division_width=division_width
     );
     clear()
@@ -154,7 +153,6 @@ module carcas(
         width=width,
         face_thickness=face_thickness,
         face_width=face_width,
-        carcas_thickness=carcas_thickness,
         division_width=division_width
     );
     children();
