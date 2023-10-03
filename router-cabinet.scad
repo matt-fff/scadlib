@@ -844,8 +844,8 @@ carcas(
     panel_thickness=panel_thickness,
     dado_depth=dado_depth
 );
-//clear(orange)
-//drawers();
+clear(orange)
+drawers();
 clear()
 Z(
     tot_height -
