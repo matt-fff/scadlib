@@ -682,19 +682,32 @@ module drawer(
     material=carcas_material
 ) {
     part = "drawer";
+
+    // Rear
+    X((width - thickness) / 2)
+    Z(bottom_recess / 2)
+    logbox(
+        thickness,
+        x=width - (width_gap + thickness)*2,
+        h=height - height_gap*2 - bottom_recess,
+        part=part,
+        material=material,
+        subpart="rear"
+    );
     
-    // Face
-//    Y(depth)
-//    X(width / 2)
-//    logbox(
-//        thickness,
-//        x=width,
-//        h=height,
-//        part=part,
-//        material=material,
-//        subpart="side"
-//    );
-//    
+    // Interior front
+    Y(depth - thickness)
+    X((width - thickness) / 2)
+    logbox(
+        thickness,
+        x=width - (width_gap + thickness)*2,
+        h=height - height_gap*2,
+        part=part,
+        material=material,
+        subpart="interior-front"
+    );
+    
+    // Sides
     pieces(2)
     X(width_gap)
     X(span(
@@ -729,7 +742,8 @@ module drawers(
     drawer_height=drawer_height,
     dado_depth=dado_depth,
     panel_thickness=panel_thickness,
-    drawer_thickness=carcas_thickness
+    drawer_thickness=carcas_thickness,
+    open=false
 ){
     // from drawer slide specs
     // min top clearance = 6mm
@@ -748,70 +762,93 @@ module drawers(
         panel_thickness -
         face_thickness
     );
-    
-    drawer_width = (
-        division_width -
-        max(face_width, carcas_thickness*2)
-    );
+
+    center_dead_space = max(face_width, carcas_thickness*2);
+    side_dead_space = max(face_width, carcas_thickness);
+
+    center_drawer_width = division_width - center_dead_space;
+    side_face_offset = max(face_width - carcas_thickness, 0);
+    side_drawer_width = center_drawer_width - side_face_offset;
+
+    // For optional
+    open_offset = open ? (
+      drawer_depth - 
+      drawer_thickness -
+      face_thickness
+    ) : 0;
     
     g(
         Y(
             panel_thickness + 
-            carcas_thickness
+            carcas_thickness +
+            face_thickness +
+            open_offset
         ),
+        X(drawer_thickness / 2),
         TOREAR(),
         TORIGHT()
     ){
         //
-        // SIDE HORIZONTAL DIVIDERS
+        // SIDE DRAWERS
         //
         
         g(
             Z(
                 height -
-                top_gap - 
                 drawer_height/2
             ),
-            X(carcas_thickness)
+            X(side_dead_space)
+
         ){
-//            // Right Horizontal Divider
-//            drawer(
-//                depth=drawer_depth,
-//                height=drawer_height,
-//                width=drawer_width,
-//                width_gap=width_gap,
-//                height_gap=height_gap,
-//                bottom_recess=bottom_recess,
-//                thickness=carcas_thickness
-//            );
-//        // Left Horizontal Divider
-//        X(division_width*2)
-//        drawer(
-//            depth=drawer_depth,
-//            height=drawer_height,
-//            width=drawer_width
-//        );
+            pieces(2)
+            X(span(
+              width - 
+              side_drawer_width - 
+              2*side_dead_space
+            ))
+            drawer(
+              depth=drawer_depth,
+              height=drawer_height,
+              width=side_drawer_width,
+              width_gap=width_gap,
+              height_gap=height_gap,
+              bottom_recess=bottom_recess,
+              thickness=drawer_thickness
+            );
         }
         
         //
-        // CENTER HORIZONTAL DIVIDERS
+        // CENTER DRAWERS
         //
-        
-        Z(drawer_height/2)
-        X(
-            division_width + 
-            carcas_thickness + 
-            drawer_thickness / 2
-        )
-        drawer(
-            depth=drawer_depth,
-            height=drawer_height,
-            width=drawer_width,
-            width_gap=width_gap,
-            height_gap=height_gap,
-            bottom_recess=bottom_recess,
-            thickness=drawer_thickness
-        );
+        g(
+            X(
+                division_width + 
+                carcas_thickness
+            ),
+            Z(drawer_height/2)
+        ){
+
+          pieces(2)
+          Z(span(drawer_height))
+          drawer(
+              depth=drawer_depth,
+              height=drawer_height,
+              width=center_drawer_width,
+              width_gap=width_gap,
+              height_gap=height_gap,
+              bottom_recess=bottom_recess,
+              thickness=drawer_thickness
+          );
+          drawer(
+              depth=drawer_depth,
+              height=drawer_height,
+              width=center_drawer_width,
+              width_gap=width_gap,
+              height_gap=height_gap,
+              bottom_recess=bottom_recess,
+              thickness=drawer_thickness
+          );
+        }
     }
     children();
 }
@@ -850,7 +887,8 @@ module cabinet(
         carcas_thickness=carcas_thickness,
         drawer_height=drawer_height,
         panel_thickness=panel_thickness,
-        dado_depth=dado_depth
+        dado_depth=dado_depth,
+        open=false
 ){
     carcas(
         depth=depth,
@@ -882,7 +920,8 @@ module cabinet(
       drawer_height=drawer_height,
       dado_depth=dado_depth,
       panel_thickness=panel_thickness,
-      drawer_thickness=carcas_thickness
+      drawer_thickness=carcas_thickness,
+      open=open
     );
     clear()
     Z(
@@ -897,5 +936,5 @@ module cabinet(
     );
 }
 
-cabinet();
+cabinet(open=true);
 
