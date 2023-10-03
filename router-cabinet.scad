@@ -679,29 +679,35 @@ module drawer(
     height_gap=20,
     bottom_recess=13,
     thickness=carcas_thickness,
+    material=carcas_material
 ) {
     part = "drawer";
     
     // Face
-    Y(depth)
-    X(width/2)
-    logbox(
-        thickness,
-        x=width,
-        h=height,
-        part=part,
-        material=carcas_material,
-        subpart="side"
-    );
-    
+//    Y(depth)
+//    X(width / 2)
+//    logbox(
+//        thickness,
+//        x=width,
+//        h=height,
+//        part=part,
+//        material=material,
+//        subpart="side"
+//    );
+//    
     pieces(2)
-    X(span(width - width_gap - thickness*2))
+    X(width_gap)
+    X(span(
+        width - 
+        width_gap*2 -
+        thickness
+    ))
     logbox(
         depth,
         x=thickness,
-        h=height-height_gap,
+        h=height - height_gap*2,
         part=part,
-        material=carcas_material,
+        material=material,
         subpart="side"
     );
     children();
@@ -722,7 +728,8 @@ module drawers(
     division_width=tot_width / 3,
     drawer_height=drawer_height,
     dado_depth=dado_depth,
-    panel_thickness=panel_thickness
+    panel_thickness=panel_thickness,
+    drawer_thickness=carcas_thickness
 ){
     // from drawer slide specs
     // min top clearance = 6mm
@@ -731,7 +738,7 @@ module drawers(
     // The specs are pretty idiotic in how they lay it out
     width_gap = 42 - (carcas_thickness * 2);
     bottom_gap = 14;
-    top_gap = 6;
+    top_gap = 10;
     height_gap = bottom_gap + top_gap;
     bottom_recess = 13;
     
@@ -792,8 +799,9 @@ module drawers(
         
         Z(drawer_height/2)
         X(
-            // TODO I don't think this is right
-            division_width + carcas_thickness*2
+            division_width + 
+            carcas_thickness + 
+            drawer_thickness / 2
         )
         drawer(
             depth=drawer_depth,
@@ -802,7 +810,7 @@ module drawers(
             width_gap=width_gap,
             height_gap=height_gap,
             bottom_recess=bottom_recess,
-            thickness=carcas_thickness
+            thickness=drawer_thickness
         );
     }
     children();
@@ -831,30 +839,63 @@ module top(
     children();
 }
 
-carcas(
-    depth=tot_depth,
-    height=tot_height,
-    width=tot_width,
-    kick_height=kick_height,
-    top_thickness=top_thickness,
-    face_width=face_width,
-    face_thickness=face_thickness,
-    carcas_thickness=carcas_thickness,
-    drawer_height=drawer_height,
-    panel_thickness=panel_thickness,
-    dado_depth=dado_depth
-);
-clear(orange)
-drawers();
-clear()
-Z(
-    tot_height -
-    kick_height -
-    top_thickness/2
-)top(
-    depth=tot_depth,
-    width=tot_width,
-    thickness=top_thickness,
-    overhang=top_overhang
-);
+module cabinet(
+        depth=tot_depth,
+        height=tot_height,
+        width=tot_width,
+        kick_height=kick_height,
+        top_thickness=top_thickness,
+        face_width=face_width,
+        face_thickness=face_thickness,
+        carcas_thickness=carcas_thickness,
+        drawer_height=drawer_height,
+        panel_thickness=panel_thickness,
+        dado_depth=dado_depth
+){
+    carcas(
+        depth=depth,
+        height=height,
+        width=width,
+        kick_height=kick_height,
+        top_thickness=top_thickness,
+        face_width=face_width,
+        face_thickness=face_thickness,
+        carcas_thickness=carcas_thickness,
+        drawer_height=drawer_height,
+        panel_thickness=panel_thickness,
+        dado_depth=dado_depth
+    );
+    clear(orange)
+    drawers(
+      depth=tot_depth,
+      height=(
+          height -
+          kick_height -
+          top_thickness -
+          carcas_thickness
+      ),
+      width=width,
+      face_width=face_width,
+      face_thickness=face_thickness,
+      carcas_thickness=carcas_thickness,
+      division_width=width / 3,
+      drawer_height=drawer_height,
+      dado_depth=dado_depth,
+      panel_thickness=panel_thickness,
+      drawer_thickness=carcas_thickness
+    );
+    clear()
+    Z(
+        height -
+        kick_height -
+        top_thickness/2
+    )top(
+        depth=depth,
+        width=width,
+        thickness=top_thickness,
+        overhang=top_overhang
+    );
+}
+
+cabinet();
 
