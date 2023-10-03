@@ -671,58 +671,120 @@ module carcas(
     children();
 }
 
+module drawer_bottom(
+    depth=inch_to_mm(15),
+    width=tot_width/3 - carcas_thickness*2,
+    width_gap=42 - (carcas_thickness * 2),
+    shell_thickness=carcas_thickness,
+    material=panel_material,
+    should_log=true
+){
+    part = "drawer";
+    logbox(
+        depth + dado_depth - shell_thickness,
+        x=width - (
+          width_gap + 
+          shell_thickness - 
+          dado_depth
+        )*2,
+        h=panel_thickness,
+        part=part,
+        material=material,
+        subpart="bottom",
+        should_log=should_log
+    );
+    children();
+}
+
 module drawer(
     depth=inch_to_mm(15),
     height=drawer_height,
     width=tot_width/3 - carcas_thickness*2,
-    width_gap=4,
-    height_gap=20,
+    width_gap=42 - (carcas_thickness * 2),
+    top_gap=10,
+    bottom_gap=14,
     bottom_recess=13,
-    thickness=carcas_thickness,
-    material=carcas_material
+    bottom_thickness=panel_thickness,
+    shell_thickness=carcas_thickness,
+    shell_material=carcas_material,
+    face_thickness=face_thickness,
+    face_trim_material=face_material,
+    face_interior_material=face_material,
+    bottom_material=panel_material
 ) {
     part = "drawer";
+    height_gap = bottom_gap + top_gap;
+    center_offset = (width - shell_thickness) / 2;
 
-    // Rear
-    X((width - thickness) / 2)
-    Z(bottom_recess / 2)
-    logbox(
-        thickness,
-        x=width - (width_gap + thickness)*2,
-        h=height - height_gap*2 - bottom_recess,
-        part=part,
-        material=material,
-        subpart="rear"
-    );
+    assemble() { 
+      // Rear
+      add()
+      Z(bottom_recess / 2)
+      X(center_offset)
+      logbox(
+          shell_thickness,
+          x=width - (width_gap + shell_thickness)*2,
+          h=height - height_gap*2 - bottom_recess,
+          part=part,
+          material=shell_material,
+          subpart="rear"
+      );
+
+      bottom_offset = -height/2 + bottom_gap + bottom_recess*2;
+
+      // Bottom panel
+      Z(bottom_offset)
+      X(center_offset)
+      add()
+      drawer_bottom(
+        depth=depth,
+        width=width,
+        width_gap=width_gap,
+        shell_thickness=shell_thickness,
+        material=bottom_material,
+        should_log=true
+      )
+      remove()
+      drawer_bottom(
+        depth=depth,
+        width=width,
+        width_gap=width_gap,
+        shell_thickness=shell_thickness,
+        material=bottom_material,
+        should_log=false
+      );
     
-    // Interior front
-    Y(depth - thickness)
-    X((width - thickness) / 2)
-    logbox(
-        thickness,
-        x=width - (width_gap + thickness)*2,
-        h=height - height_gap*2,
-        part=part,
-        material=material,
-        subpart="interior-front"
-    );
-    
-    // Sides
-    pieces(2)
-    X(width_gap)
-    X(span(
-        width - 
-        width_gap*2 -
-        thickness
-    ))
-    logbox(
-        depth,
-        x=thickness,
-        h=height - height_gap*2,
-        part=part,
-        material=material,
-        subpart="side"
-    );
+      // Interior front
+      add()
+      Y(depth - shell_thickness)
+      X(center_offset)
+      logbox(
+          shell_thickness,
+          x=width - (width_gap + shell_thickness)*2,
+          h=height - height_gap*2,
+          part=part,
+          material=shell_material,
+          subpart="front"
+      );
+
+      // Sides
+      add()
+      pieces(2)
+      X(width_gap)
+      X(span(
+          width - 
+          width_gap*2 -
+          shell_thickness
+      ))
+      logbox(
+          depth,
+          x=shell_thickness,
+          h=height - height_gap*2,
+          part=part,
+          material=shell_material,
+          subpart="side"
+      );
+    }
     children();
 }
 
@@ -753,7 +815,6 @@ module drawers(
     width_gap = 42 - (carcas_thickness * 2);
     bottom_gap = 14;
     top_gap = 10;
-    height_gap = bottom_gap + top_gap;
     bottom_recess = 13;
     
     drawer_depth = (
@@ -811,9 +872,12 @@ module drawers(
               height=drawer_height,
               width=side_drawer_width,
               width_gap=width_gap,
-              height_gap=height_gap,
+              top_gap=top_gap,
+              bottom_gap=bottom_gap,
               bottom_recess=bottom_recess,
-              thickness=drawer_thickness
+              bottom_thickness=drawer_thickness,
+              shell_thickness=carcas_thickness,
+              face_thickness=face_thickness
             );
         }
         
@@ -835,18 +899,24 @@ module drawers(
               height=drawer_height,
               width=center_drawer_width,
               width_gap=width_gap,
-              height_gap=height_gap,
+              top_gap=top_gap,
+              bottom_gap=bottom_gap,
               bottom_recess=bottom_recess,
-              thickness=drawer_thickness
+              bottom_thickness=drawer_thickness,
+              shell_thickness=carcas_thickness,
+              face_thickness=face_thickness
           );
           drawer(
               depth=drawer_depth,
               height=drawer_height,
               width=center_drawer_width,
               width_gap=width_gap,
-              height_gap=height_gap,
+              top_gap=top_gap,
+              bottom_gap=bottom_gap,
               bottom_recess=bottom_recess,
-              thickness=drawer_thickness
+              bottom_thickness=drawer_thickness,
+              shell_thickness=carcas_thickness,
+              face_thickness=face_thickness
           );
         }
     }
