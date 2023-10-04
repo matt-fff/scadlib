@@ -3,6 +3,37 @@ include <scadlib/common/cutlist.scad>
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 
+
+module face(
+    depth=undef,
+    height=undef,
+    width=undef,
+    face_thickness=undef,
+    face_width=undef,
+    carcas_thickness=undef,
+    division_width=undef
+){
+  face_plate_outline(
+      depth=depth,
+      height=height,
+      width=width,
+      face_thickness=face_thickness,
+      face_width=face_width,
+      carcas_thickness=carcas_thickness,
+      division_width=division_width
+  );
+  face_plate_storage(
+      depth=depth,
+      height=height,
+      width=width,
+      face_thickness=face_thickness,
+      face_width=face_width,
+      carcas_thickness=carcas_thickness,
+      division_width=division_width
+  );
+  children();
+}
+
 module face_plate_outline(
     depth=undef,
     height=undef,
@@ -10,6 +41,7 @@ module face_plate_outline(
     face_thickness=undef,
     face_width=undef,
     face_material=undef,
+    carcas_thickness=undef,
     division_width=undef
 ){
     depth = val_or_default(depth, TOT_DEPTH);
@@ -18,83 +50,77 @@ module face_plate_outline(
     face_width = val_or_default(face_width, FACE_WIDTH);
     face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
     face_material = val_or_default(face_material, FACE_MATERIAL);
+    carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
     division_width = val_or_default(division_width, DIVISION_WIDTH);
 
     material = face_material;
     part = "face_plate_outline";
-    rail_width = width - face_width*2;
+    rail_width = width;
+    stile_height = height - face_width - carcas_thickness;
 
+    z_offset = -(face_width/2 - carcas_thickness);
+
+    //
+    // FRAME OUTLINE
+    //
     TORIGHT()
     g(
-        Y(depth - face_width/2),
+        Y(depth - face_thickness),
+        Z(z_offset),
         TOREAR()
     ){
         //
-        // FRAME OUTLINE
+        // FRAME RAILS
         //
         
-        X(face_width)
-        // Bottom
-        logbox(
-            face_thickness,
-            x=rail_width,
-            h=face_width,
-            part=part,
-            material=material,
-            subpart="bottom"
-        )
-        // Top
-        Z(height - face_width/2)
-        logbox(
-            face_thickness,
-            x=rail_width,
-            h=face_width,
-            part=part,
-            material=material,
-            subpart="top"
-        );
-        
-        
-        Z((height - face_width/2)/2)
-        // Right
-        logbox(
-            face_thickness,
-            x=face_width,
-            h=height + face_width/2,
-            part=part,
-            material=material,
-            subpart="right"
-        )
-        // Left
-        X(width - face_width)
-        logbox(
-            face_thickness,
-            x=face_width,
-            h=height + face_width/2,
-            part=part,
-            material=material,
-            subpart="left"
-        );
-        
-        //
-        // FRAME VERTICAL DIVIDERS
-        //
-        
-        Z((height - face_width/2)/2)
-        X(division_width - face_width/2)
+        // Top and bottom
         pieces(2)
-        X(span(division_width))
+        Z(span(height - carcas_thickness))
         logbox(
             face_thickness,
-            x=face_width,
-            h=(
-                height - 
-                face_width * 1.5
-            ),
+            x=rail_width,
+            h=face_width,
             part=part,
             material=material,
-            subpart=vRepeat("right_divider", "left_divider")
+            subpart=vRepeat("bottom", "top")
         );
+        
+        
+
+        g(
+          Z((stile_height + face_width)/2)
+        ){
+          //
+          // FRAME STILES
+          //
+          // Right and left
+          pieces(2)
+          X(span(width - face_width))
+          logbox(
+              face_thickness,
+              x=face_width,
+              h=stile_height,
+              part=part,
+              material=material,
+              subpart=vRepeat("right", "left")
+          );
+          
+          //
+          // FRAME VERTICAL DIVIDERS
+          //
+          
+          X(division_width - face_width/2)
+          pieces(2)
+          X(span(division_width))
+          logbox(
+              face_thickness,
+              x=face_width,
+              h=stile_height,
+              part=part,
+              material=material,
+              subpart=vRepeat("right_divider", "left_divider")
+          );
+        }
     }
     children();
 }
@@ -106,6 +132,7 @@ module face_plate_storage(
     face_width=undef,
     face_thickness=undef,
     face_material=undef,
+    carcas_thickness=undef,
     division_width=undef,
     drawer_height=undef
 ){
@@ -115,14 +142,18 @@ module face_plate_storage(
     face_width = val_or_default(face_width, FACE_WIDTH);
     face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
     face_material = val_or_default(face_material, FACE_MATERIAL);
+    carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
     division_width = val_or_default(division_width, DIVISION_WIDTH);
     drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
+
+    z_offset = -(face_width/2 - carcas_thickness);
 
     material = face_material;
     part = "face_plate_storage";
     TORIGHT()
     g(
-        Y(depth - face_width/2),
+        Y(depth - face_thickness),
+        Z(z_offset),
         TOREAR()
     ){
         //
@@ -168,7 +199,7 @@ module face_plate_storage(
         //
         
         X(division_width + face_width/2)
-        Z(drawer_height)
+        Z(drawer_height - z_offset/2)
         logbox(
             face_thickness,
             x=(
@@ -178,10 +209,10 @@ module face_plate_storage(
             h=face_width,
             part=part,
             material=material,
-            subpart="center_divider"
+            subpart=vRepeat("bottom_center_divider", "top_center_divider")
         )
         // Bottom Horizontal Divider
-        Z(drawer_height)
+        Z(drawer_height - z_offset/2)
         logbox(
             face_thickness,
             x=(

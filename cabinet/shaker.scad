@@ -47,10 +47,7 @@ module rail(
       h=height
     );
 
-    tenon_vert_offset = (
-      height -
-      tenon_depth 
-    );
+    tenon_vert_offset = height - tenon_depth;
 
     remove()
     Y(tenon_void_thickness)
@@ -136,25 +133,25 @@ module shaker_face(
     // Rails
     g(
       Z(-(height - trim_width)/2),
-      X(width/2)
+      X(width/2) 
     ){
-      pieces(2)
-      Z(span(height - trim_width))
-      add()
-      rail(
-        width=width - trim_width*2,
-        height=trim_width,
-        thickness=trim_thickness,
-        tenon_depth=tenon_depth,
-        tenon_thickness=tenon_thickness,
-        is_top=vRepeat(false, true),
-        part=part
-      );
+      //pieces(2)
+      //Z(span(height - trim_width))
+      //add()
+      //rail(
+      //  width=width - trim_width*2,
+      //  height=trim_width,
+      //  thickness=trim_thickness,
+      //  tenon_depth=tenon_depth,
+      //  tenon_thickness=tenon_thickness,
+      //  is_top=vRepeat(false, true),
+      //  part=part
+      //);
       children();
     }
 
     // Stiles
-    //X(trim_width - tenon_depth)
+    X(trim_width/2)
     pieces(2)
     X(span(width - trim_width))
     stile(

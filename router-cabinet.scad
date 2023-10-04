@@ -4,7 +4,7 @@ include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 include <scadlib/cabinet/carcas.scad>
 include <scadlib/cabinet/face.scad>
-include <scadlib/cabinet/drawer.scad>
+include <scadlib/cabinet/storage.scad>
 include <scadlib/cabinet/top.scad>
 
 module cabinet(
@@ -19,7 +19,7 @@ module cabinet(
         drawer_height=undef,
         panel_thickness=undef,
         dado_depth=undef,
-        open=false,
+        explode=false,
         hide=""
 ){
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
@@ -50,6 +50,7 @@ module cabinet(
       );
     }
     if(!in("drawer", hide)) {
+      Z(kick_height)
       clear(orange)
       drawers(
         depth=depth,
@@ -62,7 +63,7 @@ module cabinet(
         panel_thickness=panel_thickness,
         carcas_thickness=carcas_thickness,
         top_thickness=top_thickness,
-        open=open
+        explode=explode
       );
     }
     if(!in("top", hide)) {
@@ -71,13 +72,25 @@ module cabinet(
           height -
           kick_height -
           top_thickness/2
-      )top(
+      )
+      top(
           depth=depth,
           width=width,
           thickness=top_thickness
       );
     }
+    if(!in("face", hide)) {
+      clear()
+      face(
+          depth=depth,
+          height=height - kick_height - top_thickness,
+          width=width,
+          face_thickness=face_thickness,
+          face_width=face_width,
+          carcas_thickness=carcas_thickness
+      );
+    }
 }
 
-cabinet(open=true, hide="");
+cabinet(explode=false, hide="drawer");
 
