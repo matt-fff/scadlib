@@ -19,7 +19,8 @@ module cabinet(
         drawer_height=undef,
         panel_thickness=undef,
         dado_depth=undef,
-        open=false
+        open=false,
+        hide=""
 ){
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
     depth = val_or_default(depth, TOT_DEPTH);
@@ -33,49 +34,50 @@ module cabinet(
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
 
-    carcas(
+    if(!in("carcas", hide)) {
+      carcas(
+          depth=depth,
+          height=height,
+          width=width,
+          kick_height=kick_height,
+          top_thickness=top_thickness,
+          face_width=face_width,
+          face_thickness=face_thickness,
+          carcas_thickness=carcas_thickness,
+          drawer_height=drawer_height,
+          panel_thickness=panel_thickness,
+          dado_depth=dado_depth
+      );
+    }
+    if(!in("drawer", hide)) {
+      clear(orange)
+      drawers(
         depth=depth,
         height=height,
         width=width,
-        kick_height=kick_height,
-        top_thickness=top_thickness,
         face_width=face_width,
-        face_thickness=face_thickness,
-        carcas_thickness=carcas_thickness,
+        face_trim_thickness=face_thickness,
         drawer_height=drawer_height,
+        dado_depth=dado_depth,
         panel_thickness=panel_thickness,
-        dado_depth=dado_depth
-    );
-    //clear(orange)
-    drawers(
-      depth=depth,
-      height=(
+        carcas_thickness=carcas_thickness,
+        top_thickness=top_thickness,
+        open=open
+      );
+    }
+    if(!in("top", hide)) {
+      clear()
+      Z(
           height -
           kick_height -
-          top_thickness -
-          carcas_thickness
-      ),
-      width=width,
-      face_width=face_width,
-      face_thickness=face_thickness,
-      division_width=width / 3,
-      drawer_height=drawer_height,
-      dado_depth=dado_depth,
-      panel_thickness=panel_thickness,
-      shell_thickness=carcas_thickness,
-      open=open
-    );
-    clear()
-    Z(
-        height -
-        kick_height -
-        top_thickness/2
-    )top(
-        depth=depth,
-        width=width,
-        thickness=top_thickness
-    );
+          top_thickness/2
+      )top(
+          depth=depth,
+          width=width,
+          thickness=top_thickness
+      );
+    }
 }
 
-cabinet(open=false);
+cabinet(open=true, hide="");
 

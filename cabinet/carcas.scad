@@ -4,7 +4,7 @@ include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 
 BRACE_WIDTH = inch_to_mm(3.125);
-KICK_INSET= inch_to_mm(3);
+KICK_INSET = inch_to_mm(3);
 
 module carcas(
     depth=undef,
@@ -31,7 +31,7 @@ module carcas(
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
 
-    division_width = width / 3;
+    division_width = DIVISION_WIDTH;
 
     col1 = pink;
     col2 = red;
@@ -366,7 +366,7 @@ module frame_storage(
     drawer_height=undef,
     dado_depth=undef,
     panel_thickness=undef,
-    should_log=true
+    should_log=true,
 ){
     depth = val_or_default(depth, TOT_DEPTH);
     height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);

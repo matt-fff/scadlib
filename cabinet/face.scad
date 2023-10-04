@@ -18,7 +18,7 @@ module face_plate_outline(
     face_width = val_or_default(face_width, FACE_WIDTH);
     face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
     face_material = val_or_default(face_material, FACE_MATERIAL);
-    division_width = val_or_default(division_width, TOT_WIDTH / 3);
+    division_width = val_or_default(division_width, DIVISION_WIDTH);
 
     material = face_material;
     part = "face_plate_outline";
@@ -115,7 +115,7 @@ module face_plate_storage(
     face_width = val_or_default(face_width, FACE_WIDTH);
     face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
     face_material = val_or_default(face_material, FACE_MATERIAL);
-    division_width = val_or_default(division_width, TOT_WIDTH / 3);
+    division_width = val_or_default(division_width, DIVISION_WIDTH);
     drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
 
     material = face_material;

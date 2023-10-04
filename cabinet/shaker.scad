@@ -142,7 +142,7 @@ module shaker_face(
       Z(span(height - trim_width))
       add()
       rail(
-        width=width - trim_width,
+        width=width - trim_width*2,
         height=trim_width,
         thickness=trim_thickness,
         tenon_depth=tenon_depth,
@@ -154,8 +154,9 @@ module shaker_face(
     }
 
     // Stiles
+    //X(trim_width - tenon_depth)
     pieces(2)
-    X(span(width))
+    X(span(width - trim_width))
     stile(
       width=trim_width,
       height=height,
