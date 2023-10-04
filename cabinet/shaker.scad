@@ -4,21 +4,26 @@ include <scadlib/cabinet/defaults.scad>
 
 
 
-tenon_depth = dado_depth * 3;
-tenon_thickness = face_thickness / 3;
+TENON_DEPTH = DADO_DEPTH * 3;
+TENON_THICKNESS = FACE_THICKNESS / 3;
 
 module rail(
   width,
   height,
-  thickness=face_thickness,
-  tenon_depth=tenon_depth,
-  tenon_thickness=tenon_thickness,
+  thickness=undef,
+  tenon_depth=undef,
+  tenon_thickness=undef,
   is_top=true,
   part="face",
   should_log=true
 ){
+  thickness = val_or_default(thickness, FACE_THICKNESS);
+  tenon_depth = val_or_default(tenon_depth, TENON_DEPTH);
+  tenon_thickness = val_or_default(tenon_thickness, TENON_THICKNESS);
+
   width_with_tenon = width + tenon_depth*2;
   tenon_void_thickness = thickness - tenon_thickness*2;
+
 
   assemble(){
     add()
@@ -64,13 +69,17 @@ module rail(
 module stile(
   width,
   height,
-  thickness=face_thickness,
-  tenon_depth=tenon_depth,
-  tenon_thickness=tenon_thickness,
+  thickness=undef,
+  tenon_depth=undef,
+  tenon_thickness=undef,
   is_left=true,
   part="face",
   should_log=true
 ){
+  thickness = val_or_default(thickness, FACE_THICKNESS);
+  tenon_depth = val_or_default(tenon_depth, TENON_DEPTH);
+  tenon_thickness = val_or_default(tenon_thickness, TENON_THICKNESS);
+  
   tenon_void_thickness = thickness - tenon_thickness*2;
   assemble(){
     add()
@@ -105,16 +114,25 @@ module stile(
 module shaker_face(
   width,
   height,
-  trim_thickness=face_thickness,
-  trim_width=face_width,
-  trim_overlay=face_overlay,
-  trim_material=face_material,
-  tenon_thickness=tenon_thickness,
-  tenon_depth=tenon_depth,
-  panel_thickness=panel_thickness,
-  panel_material=panel_material,
+  trim_thickness=undef,
+  trim_width=undef,
+  trim_overlay=undef,
+  trim_material=undef,
+  tenon_thickness=undef,
+  tenon_depth=undef,
+  panel_thickness=undef,
+  panel_material=undef,
   part="face"
 ){
+    trim_thickness = val_or_default(trim_thickness, FACE_THICKNESS);
+    trim_width = val_or_default(trim_width, FACE_WIDTH);
+    trim_overlay = val_or_default(trim_overlay, FACE_OVERLAY);
+    trim_material = val_or_default(trim_material, FACE_MATERIAL);
+    tenon_thickness = val_or_default(tenon_thickness, TENON_THICKNESS);
+    tenon_depth = val_or_default(tenon_depth, TENON_DEPTH);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+    panel_material = val_or_default(panel_material, PANEL_MATERIAL);
+
     // Rails
     g(
       Z(-(height - trim_width)/2),

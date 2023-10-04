@@ -8,19 +8,31 @@ include <scadlib/cabinet/drawer.scad>
 include <scadlib/cabinet/top.scad>
 
 module cabinet(
-        depth=tot_depth,
-        height=tot_height,
-        width=tot_width,
-        kick_height=kick_height,
-        top_thickness=top_thickness,
-        face_width=face_width,
-        face_thickness=face_thickness,
-        carcas_thickness=carcas_thickness,
-        drawer_height=drawer_height,
-        panel_thickness=panel_thickness,
-        dado_depth=dado_depth,
+        depth=undef,
+        height=undef,
+        width=undef,
+        kick_height=undef,
+        top_thickness=undef,
+        face_width=undef,
+        face_thickness=undef,
+        carcas_thickness=undef,
+        drawer_height=undef,
+        panel_thickness=undef,
+        dado_depth=undef,
         open=false
 ){
+    carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(height, TOT_HEIGHT);
+    width = val_or_default(width, TOT_WIDTH);
+    kick_height = val_or_default(kick_height, KICK_HEIGHT);
+    top_thickness = val_or_default(top_thickness, TOP_THICKNESS);
+    face_width = val_or_default(face_width, FACE_WIDTH);
+    face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
+    drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+    dado_depth = val_or_default(dado_depth, DADO_DEPTH);
+
     carcas(
         depth=depth,
         height=height,
@@ -35,36 +47,34 @@ module cabinet(
         dado_depth=dado_depth
     );
     //clear(orange)
-    //drawers(
-    //  depth=tot_depth,
-    //  height=(
-    //      height -
-    //      kick_height -
-    //      top_thickness -
-    //      carcas_thickness
-    //  ),
-    //  width=width,
-    //  face_width=face_width,
-    //  face_thickness=face_thickness,
-    //  carcas_thickness=carcas_thickness,
-    //  division_width=width / 3,
-    //  drawer_height=drawer_height,
-    //  dado_depth=dado_depth,
-    //  panel_thickness=panel_thickness,
-    //  drawer_thickness=carcas_thickness,
-    //  open=open
-    //);
-    //clear()
-    //Z(
-    //    height -
-    //    kick_height -
-    //    top_thickness/2
-    //)top(
-    //    depth=depth,
-    //    width=width,
-    //    thickness=top_thickness,
-    //    overhang=top_overhang
-    //);
+    drawers(
+      depth=depth,
+      height=(
+          height -
+          kick_height -
+          top_thickness -
+          carcas_thickness
+      ),
+      width=width,
+      face_width=face_width,
+      face_thickness=face_thickness,
+      division_width=width / 3,
+      drawer_height=drawer_height,
+      dado_depth=dado_depth,
+      panel_thickness=panel_thickness,
+      shell_thickness=carcas_thickness,
+      open=open
+    );
+    clear()
+    Z(
+        height -
+        kick_height -
+        top_thickness/2
+    )top(
+        depth=depth,
+        width=width,
+        thickness=top_thickness
+    );
 }
 
 cabinet(open=false);

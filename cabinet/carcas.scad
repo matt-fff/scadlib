@@ -3,19 +3,34 @@ include <scadlib/common/cutlist.scad>
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 
+BRACE_WIDTH = inch_to_mm(3.125);
+KICK_INSET= inch_to_mm(3);
+
 module carcas(
-    depth=tot_depth,
-    height=tot_height,
-    width=tot_width,
-    kick_height=kick_height,
-    top_thickness=top_thickness,
-    face_thickness=face_thickness,
-    face_width=face_width,
-    carcas_thickness=carcas_thickness,
-    drawer_height=drawer_height,
-    panel_thickness=panel_thickness,
-    dado_depth=dado_depth
+    depth=undef,
+    height=undef,
+    width=undef,
+    kick_height=undef,
+    top_thickness=undef,
+    face_thickness=undef,
+    face_width=undef,
+    carcas_thickness=undef,
+    drawer_height=undef,
+    panel_thickness=undef,
+    dado_depth=undef
 ){
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(height, TOT_HEIGHT);
+    width = val_or_default(width, TOT_WIDTH);
+    kick_height = val_or_default(kick_height, KICK_HEIGHT);
+    top_thickness = val_or_default(top_thickness, TOP_THICKNESS);
+    face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
+    face_width = val_or_default(face_width, FACE_WIDTH);
+    carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
+    drawer_height= val_or_default(drawer_height, DRAWER_HEIGHT);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+    dado_depth = val_or_default(dado_depth, DADO_DEPTH);
+
     division_width = width / 3;
 
     col1 = pink;
@@ -159,16 +174,22 @@ module carcas(
 }
 
 module kick_plate(
-    depth=tot_depth,
-    height=kick_height,
-    width=tot_width,
-    thickness=carcas_thickness,
-    kick_inset=inch_to_mm(3),
+    depth=undef,
+    height=undef,
+    width=undef,
+    thickness=undef,
+    kick_inset=undef,
     left_exposed=false,
     right_exposed=false
 ){
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(height, KICK_HEIGHT);
+    width = val_or_default(width, TOT_WIDTH);
+    thickness = val_or_default(thickness, CARCAS_THICKNESS);
+    kick_inset = val_or_default(kick_inset, KICK_INSET);
+
     part = "kick_plate";
-    material = carcas_material;
+    material = CARCAS_MATERIAL;
 
     TORIGHT()
     g(
@@ -229,15 +250,21 @@ module kick_plate(
 }
 
 module frame_outline(
-    depth=tot_depth,
-    height=tot_height - kick_height - top_thickness,
-    width=tot_width,
-    thickness=carcas_thickness,
-    brace_width=brace_width,
+    depth=undef,
+    height=undef,
+    width=undef,
+    thickness=undef,
+    brace_width=undef,
     col=yellow
 ){
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
+    width = val_or_default(width, TOT_WIDTH);
+    thickness = val_or_default(thickness, CARCAS_THICKNESS);
+    brace_width = val_or_default(brace_width, BRACE_WIDTH);
+
     part = "frame_outline";
-    material = carcas_material;
+    material = CARCAS_MATERIAL;
     clear(col)
     TORIGHT()
     g(TOREAR()) {
@@ -267,16 +294,23 @@ module frame_outline(
 }
 
 module frame_braces(
-    depth=tot_depth,
-    height=tot_height - kick_height - top_thickness,
-    width=tot_width,
-    thickness=carcas_thickness,
-    brace_width=brace_width,
-    col=yellow,
-    panel_thickness=panel_thickness
+    depth=undef,
+    height=undef,
+    width=undef,
+    thickness=undef,
+    brace_width=undef,
+    panel_thickness=undef,
+    col=yellow
 ){
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
+    width = val_or_default(width, TOT_WIDTH);
+    thickness = val_or_default(thickness, CARCAS_THICKNESS);
+    brace_width = val_or_default(brace_width, BRACE_WIDTH);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+
     part = "frame_braces";
-    material = carcas_material;
+    material = CARCAS_MATERIAL;
     opaq(col)
     g(){
         // Back Braces
@@ -322,20 +356,31 @@ module frame_braces(
 }
 
 module frame_storage(
-    depth=tot_depth,
-    height=tot_height - kick_height - top_thickness,
-    width=tot_width,
-    face_width=face_width,
-    face_thickness=face_thickness,
-    carcas_thickness=carcas_thickness,
-    division_width=tot_width / 3,
-    drawer_height=drawer_height,
-    dado_depth=dado_depth,
-    panel_thickness=panel_thickness,
+    depth=undef,
+    height=undef,
+    width=undef,
+    face_width=undef,
+    face_thickness=undef,
+    carcas_thickness=undef,
+    division_width=undef,
+    drawer_height=undef,
+    dado_depth=undef,
+    panel_thickness=undef,
     should_log=true
 ){
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
+    width = val_or_default(width, TOT_WIDTH);
+    face_width = val_or_default(face_width, FACE_WIDTH);
+    face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
+    carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
+    division_width = val_or_default(division_width, TOT_WIDTH / 3);
+    drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
+    dado_depth = val_or_default(dado_depth, DADO_DEPTH);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+
     part = "frame_storage";
-    material = carcas_material;
+    material = CARCAS_MATERIAL;
     
     divider_depth = (
         depth - 
@@ -411,14 +456,24 @@ module frame_storage(
 }
 
 module back_panel(
-    height=tot_height - kick_height - top_thickness,
-    width=tot_width,
-    carcas_thickness=carcas_thickness,
-    panel_thickness=panel_thickness,
-    dado_depth=dado_depth,
+    height=undef,
+    width=undef,
+    carcas_thickness=undef,
+    carcas_material=undef,
+    panel_thickness=undef,
+    panel_material=undef,
+    dado_depth=undef,
     col=black,
     should_log=true
 ){
+    height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
+    width = val_or_default(width, TOT_WIDTH);
+    carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
+    carcas_material = val_or_default(carcas_material, CARCAS_MATERIAL);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+    panel_material = val_or_default(panel_material, PANEL_MATERIAL);
+    dado_depth = val_or_default(dado_depth, DADO_DEPTH);
+
     material = panel_material;
     part = "back_panel";
 

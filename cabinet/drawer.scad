@@ -4,15 +4,35 @@ include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 include <scadlib/cabinet/shaker.scad>
 
+FACE_PANEL_MATERIAL = "1/2 plywood";
+FACE_PANEL_THICKNESS = inch_to_mm(0.5);
+
+DRAWER_WIDTH = TOT_WIDTH / 3 - FACE_WIDTH;
+DRAWER_WIDTH_GAP = 42 - FACE_WIDTH;
+DRAWER_DEPTH = inch_to_mm(15);
+DRAWER_TOP_GAP = 10;
+DRAWER_BOTTOM_GAP = 14;
+DRAWER_BOTTOM_RECESS = 13;
 
 module drawer_bottom(
-    depth=inch_to_mm(15),
-    width=tot_width/3 - carcas_thickness*2,
-    width_gap=42 - (carcas_thickness * 2),
-    shell_thickness=carcas_thickness,
-    material=panel_material,
+    depth=undef,
+    width=undef,
+    width_gap=undef,
+    shell_thickness=undef,
+    panel_thickness=undef,
+    material=undef,
+    dado_depth=undef,
     should_log=true
 ){
+    depth = val_or_default(depth, DRAWER_DEPTH);
+    width = val_or_default(width, DRAWER_WIDTH);
+    width_gap = val_or_default(width_gap, DRAWER_WIDTH_GAP);
+    shell_thickness = val_or_default(shell_thickness, CARCAS_THICKNESS);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+    material = val_or_default(material, PANEL_MATERIAL);
+    dado_depth = val_or_default(dado_depth, DADO_DEPTH);
+    
+
     part = "drawer";
     Y(shell_thickness)
     logbox(
@@ -32,22 +52,40 @@ module drawer_bottom(
 }
 
 module drawer(
-    depth=inch_to_mm(15),
-    height=drawer_height,
-    width=tot_width/3 - carcas_thickness*2,
-    width_gap=42 - (carcas_thickness * 2),
-    top_gap=10,
-    bottom_gap=14,
-    bottom_recess=13,
-    bottom_thickness=panel_thickness,
-    shell_thickness=carcas_thickness,
-    shell_material=carcas_material,
-    face_thickness=face_thickness,
-    face_trim_material=face_material,
-    face_panel_material=face_material,
-    bottom_material=panel_material,
-    face_overlay=face_overlay
+    depth=undef,
+    height=undef,
+    width=undef,
+    width_gap=undef,
+    top_gap=undef,
+    bottom_gap=undef,
+    bottom_recess=undef,
+    bottom_thickness=undef,
+    bottom_material=undef,
+    shell_thickness=undef,
+    shell_material=undef,
+    face_thickness=undef,
+    face_trim_material=undef,
+    face_panel_thickness=undef,
+    face_panel_material=undef,
+    face_overlay=undef
 ) {
+    depth = val_or_default(depth, DRAWER_DEPTH);
+    height = val_or_default(height, DRAWER_HEIGHT);
+    width = val_or_default(width, DRAWER_WIDTH);
+    width_gap = val_or_default(width_gap, DRAWER_WIDTH_GAP);
+    top_gap = val_or_default(top_gap, DRAWER_TOP_GAP);
+    bottom_gap = val_or_default(bottom_gap, DRAWER_BOTTOM_GAP);
+    bottom_recess = val_or_default(bottom_recess, DRAWER_BOTTOM_RECESS);
+    bottom_thickness = val_or_default(bottom_thickness, PANEL_THICKNESS);
+    shell_thickness = val_or_default(shell_thickness, CARCAS_THICKNESS);
+    shell_material = val_or_default(shell_material, CARCAS_MATERIAL);
+    face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
+    face_trim_material = val_or_default(face_trim_material, FACE_MATERIAL);
+    face_panes_thickness = val_or_default(face_panel_thickness, FACE_PANEL_THICKNESS);
+    face_panel_material = val_or_default(face_panel_material, FACE_PANEL_MATERIAL);
+    bottom_material = val_or_default(bottom_material, PANEL_MATERIAL);
+    face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
+
     part = "drawer";
     height_gap = bottom_gap + top_gap;
     center_offset = (width - shell_thickness) / 2;
@@ -122,82 +160,86 @@ module drawer(
       );
 
       // Face
-      add()
-      Y(depth + 100)
-      X(width_gap - face_overlay)
-      shaker_face(
-        width=width,
-        height=height,
-        trim_thickness=face_thickness,
-        trim_width=face_width,
-        trim_material=face_trim_material,
-        trim_overlay=face_overlay,
-        panel_thickness=panel_thickness,
-        panel_material=face_panel_material,
-        part="drawer_face"
-      );
+      //add()
+      //Y(depth + 100)
+      //X(width_gap - face_overlay)
+      //shaker_face(
+      //  width=width,
+      //  height=height,
+      //  trim_thickness=face_thickness,
+      //  trim_width=face_width,
+      //  trim_material=face_trim_material,
+      //  trim_overlay=face_overlay,
+      //  panel_thickness=panel_thickness,
+      //  panel_material=face_panel_material,
+      //  part="drawer_face"
+      //);
     }
     children();
 }
 
 module drawers(
-    depth=tot_depth,
-    height=(
-        tot_height -
-        kick_height -
-        top_thickness -
-        carcas_thickness
-    ),
-    width=tot_width,
-    face_width=face_width,
-    face_thickness=face_thickness,
-    carcas_thickness=carcas_thickness,
-    division_width=tot_width / 3,
-    drawer_height=drawer_height,
-    dado_depth=dado_depth,
-    panel_thickness=panel_thickness,
-    drawer_thickness=carcas_thickness,
+    depth=undef,
+    height=undef,
+    width=undef,
+    face_width=undef,
+    face_thickness=undef,
+    division_width=undef,
+    drawer_height=undef,
+    dado_depth=undef,
+    panel_thickness=undef,
+    shell_thickness=undef,
     open=false
 ){
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(
+      height, 
+      TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS - FACE_WIDTH/2
+    );
+    width = val_or_default(width, TOT_WIDTH);
+    face_width = val_or_default(face_width, FACE_WIDTH);
+    face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
+    division_width = val_or_default(division_width, TOT_WIDTH / 3);
+    drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
+    dado_depth = val_or_default(dado_depth, DADO_DEPTH);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+    shell_thickness = val_or_default(shell_thickness, CARCAS_THICKNESS);
+    
     // from drawer slide specs
     // min top clearance = 6mm
     // min bottom clearance (omitting recess) = 14mm
     // min INTERIOR width_gap = 42;
     // The specs are pretty idiotic in how they lay it out
-    width_gap = 42 - (carcas_thickness * 2);
+    width_gap = 42 - face_thickness;
     bottom_gap = 14;
     top_gap = 10;
     bottom_recess = 13;
     
     drawer_depth = (
         depth - 
-        carcas_thickness -
+        face_width/2 -
         panel_thickness -
         face_thickness
     );
 
-    center_dead_space = max(face_width, carcas_thickness*2);
-    side_dead_space = max(face_width, carcas_thickness);
-
-    center_drawer_width = division_width - center_dead_space;
-    side_face_offset = max(face_width - carcas_thickness, 0);
-    side_drawer_width = center_drawer_width - side_face_offset;
+    center_drawer_width = division_width - face_width;
+    side_drawer_width = center_drawer_width - face_width/2;
 
     // For optional
     open_offset = open ? (
       drawer_depth - 
-      drawer_thickness -
+      shell_thickness -
       face_thickness
     ) : 0;
     
     g(
         Y(
             panel_thickness + 
-            carcas_thickness +
+            shell_thickness +
             face_thickness +
             open_offset
         ),
-        X(drawer_thickness / 2),
+        X(shell_thickness / 2),
         TOREAR(),
         TORIGHT()
     ){
@@ -210,14 +252,14 @@ module drawers(
                 height -
                 drawer_height/2
             ),
-            X(side_dead_space)
+            X(face_width)
 
         ){
             pieces(2)
             X(span(
               width - 
               side_drawer_width - 
-              2*side_dead_space
+              2*face_width
             ))
             drawer(
               depth=drawer_depth,
@@ -227,8 +269,8 @@ module drawers(
               top_gap=top_gap,
               bottom_gap=bottom_gap,
               bottom_recess=bottom_recess,
-              bottom_thickness=drawer_thickness,
-              shell_thickness=carcas_thickness,
+              bottom_thickness=panel_thickness,
+              shell_thickness=shell_thickness,
               face_thickness=face_thickness
             );
 
@@ -240,7 +282,7 @@ module drawers(
         g(
             X(
                 division_width + 
-                carcas_thickness
+                shell_thickness
             ),
             Z(drawer_height/2)
         ){
@@ -255,8 +297,8 @@ module drawers(
               top_gap=top_gap,
               bottom_gap=bottom_gap,
               bottom_recess=bottom_recess,
-              bottom_thickness=drawer_thickness,
-              shell_thickness=carcas_thickness,
+              bottom_thickness=panel_thickness,
+              shell_thickness=shell_thickness,
               face_thickness=face_thickness
           );
           drawer(
@@ -267,8 +309,8 @@ module drawers(
               top_gap=top_gap,
               bottom_gap=bottom_gap,
               bottom_recess=bottom_recess,
-              bottom_thickness=drawer_thickness,
-              shell_thickness=carcas_thickness,
+              bottom_thickness=panel_thickness,
+              shell_thickness=shell_thickness,
               face_thickness=face_thickness
           );
         }

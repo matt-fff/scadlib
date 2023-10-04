@@ -1,25 +1,23 @@
 include <scadlib/common/utils.scad>
 
-tot_width = inch_to_mm(72);
-tot_height = inch_to_mm(39);
-tot_depth = inch_to_mm(18.5);
+TOT_WIDTH = inch_to_mm(72);
+TOT_HEIGHT = inch_to_mm(39);
+TOT_DEPTH = inch_to_mm(18.5);
 
-carcas_material = "3/4 plywood";
-carcas_thickness = inch_to_mm(0.75);
-brace_width = inch_to_mm(3.125);
+TOP_THICKNESS = inch_to_mm(0.75);
 
-top_material = "3/4 top";
-top_thickness = inch_to_mm(0.75);
-top_overhang = inch_to_mm(0.75);
+FACE_MATERIAL = "3/4 hardwood";
+FACE_THICKNESS = inch_to_mm(0.75);
+FACE_WIDTH = inch_to_mm(1.75);
+FACE_OVERLAY = inch_to_mm(0.5);
 
-face_material = "3/4 hardwood";
-face_thickness = inch_to_mm(0.75);
-face_width = carcas_thickness * 2.25;
-face_overlay = inch_to_mm(0.5);
+KICK_HEIGHT = inch_to_mm(3.5);
 
-kick_height = inch_to_mm(3.5);
-drawer_height = inch_to_mm(9);
+PANEL_MATERIAL = "1/4 plywood";
+PANEL_THICKNESS = inch_to_mm(0.25);
+DADO_DEPTH = inch_to_mm(0.25);
 
-panel_material = "1/4 plywood";
-panel_thickness = inch_to_mm(0.25);
-dado_depth = inch_to_mm(0.25);
+CARCAS_MATERIAL = "3/4 plywood";
+CARCAS_THICKNESS = inch_to_mm(0.75);
+
+DRAWER_HEIGHT = inch_to_mm(9);

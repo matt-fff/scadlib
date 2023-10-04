@@ -1,14 +1,22 @@
-include <constructive/constructive-compiled.scad>
 include <scadlib/common/cutlist.scad>
 include <scadlib/cabinet/defaults.scad>
 
+TOP_MATERIAL = "3/4 top";
+TOP_OVERHANG = inch_to_mm(0.75);
+
 module top(
-    depth=tot_depth,
-    width=tot_width,
-    thickness=top_thickness,
-    overhang=top_overhang
+    depth=undef,
+    width=undef,
+    thickness=undef,
+    overhang=undef,
+    material=undef
 ){
-    material = top_material;
+    depth = val_or_default(depth, TOT_DEPTH);
+    width = val_or_default(width, TOT_WIDTH);
+    thickness = val_or_default(thickness, TOP_THICKNESS);
+    overhang = val_or_default(overhang, TOP_OVERHANG);
+    material = val_or_default(material, TOP_MATERIAL);
+
     part = "top";
     X(-overhang)
     Y(-overhang)
@@ -17,7 +25,7 @@ module top(
     logbox(
         depth + overhang*2,
         x=width + overhang*2,
-        h=top_thickness,
+        h=thickness,
         part=part,
         material=material,
         subpart="top"

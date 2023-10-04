@@ -4,13 +4,22 @@ include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 
 module face_plate_outline(
-    depth=tot_depth,
-    height=tot_height - kick_height - top_thickness,
-    width=tot_width,
-    face_thickness=face_thickness,
-    face_width=face_width,
-    division_width=tot_width / 3
+    depth=undef,
+    height=undef,
+    width=undef,
+    face_thickness=undef,
+    face_width=undef,
+    face_material=undef,
+    division_width=undef
 ){
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
+    width = val_or_default(width, TOT_WIDTH);
+    face_width = val_or_default(face_width, FACE_WIDTH);
+    face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
+    face_material = val_or_default(face_material, FACE_MATERIAL);
+    division_width = val_or_default(division_width, TOT_WIDTH / 3);
+
     material = face_material;
     part = "face_plate_outline";
     rail_width = width - face_width*2;
@@ -91,14 +100,24 @@ module face_plate_outline(
 }
 
 module face_plate_storage(
-    depth=tot_depth,
-    height=tot_height - kick_height - top_thickness,
-    width=tot_width,
-    face_width=face_width,
-    face_thickness=face_thickness,
-    division_width=tot_width / 3,
-    drawer_height=drawer_height
+    depth=undef,
+    height=undef,
+    width=undef,
+    face_width=undef,
+    face_thickness=undef,
+    face_material=undef,
+    division_width=undef,
+    drawer_height=undef
 ){
+    depth = val_or_default(depth, TOT_DEPTH);
+    height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
+    width = val_or_default(width, TOT_WIDTH);
+    face_width = val_or_default(face_width, FACE_WIDTH);
+    face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
+    face_material = val_or_default(face_material, FACE_MATERIAL);
+    division_width = val_or_default(division_width, TOT_WIDTH / 3);
+    drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
+
     material = face_material;
     part = "face_plate_storage";
     TORIGHT()
