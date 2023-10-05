@@ -60,7 +60,7 @@ module drawer(
     opening_depth,
     opening_width,
     opening_height,
-    width_gap=undef,
+    depth_gap=undef,
     top_gap=undef,
     bottom_gap=undef,
     bottom_recess=undef,
@@ -76,7 +76,7 @@ module drawer(
     face_width=undef,
     dado_depth=undef
 ) {
-    width_gap = val_or_default(width_gap, DRAWER_WIDTH_GAP);
+    depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
     top_gap = val_or_default(top_gap, DRAWER_TOP_GAP);
     bottom_gap = val_or_default(bottom_gap, DRAWER_BOTTOM_GAP);
     bottom_recess = val_or_default(bottom_recess, DRAWER_BOTTOM_RECESS);
@@ -92,12 +92,14 @@ module drawer(
     bottom_material = val_or_default(bottom_material, PANEL_MATERIAL);
 
     // The real width gap is derived from the siding thickness 
-    relative_width_gap = opening_width - width_gap;
+    relative_width_gap = DRAWER_WIDTH_GAP - shell_thickness*2;
 
     part = "drawer";
     height_gap = bottom_gap + top_gap;
     center_offset = (opening_width - shell_thickness) / 2; // TODO probably wrong
     shell_height = opening_height - height_gap;
+    shell_width = opening_width - relative_width_gap;
+    shell_depth = opening_depth - depth_gap;
 
     // Align everything with the bottom of the drawer
     assemble() { 
@@ -107,7 +109,7 @@ module drawer(
       X(center_offset)
       logbox(
           shell_thickness,
-          x=width - (relative_width_gap + shell_thickness)*2,
+          x=shell_width - shell_thickness*2,
           h=shell_height - bottom_recess,
           part=part,
           material=shell_material,
@@ -125,8 +127,8 @@ module drawer(
       X(center_offset)
       add()
       drawer_bottom(
-        depth=drawer_depth,
-        width=width,
+        depth=shell_depth,
+        width=shell_width,
         width_gap=relative_width_gap,
         shell_thickness=shell_thickness,
         material=bottom_material,
@@ -135,8 +137,8 @@ module drawer(
       )
       remove()
       drawer_bottom(
-        depth=drawer_depth,
-        width=width,
+        depth=shell_depth,
+        width=shell_width,
         width_gap=relative_width_gap,
         shell_thickness=shell_thickness,
         material=bottom_material,
@@ -146,11 +148,11 @@ module drawer(
     
       // Interior front
       add()
-      Y(drawer_depth - shell_thickness)
+      Y(shell_depth - shell_thickness)
       X(center_offset)
       logbox(
           shell_thickness,
-          x=width - (relative_width_gap + shell_thickness)*2,
+          x=shell_width - shell_thickness*2,
           h=shell_height,
           part=part,
           material=shell_material,
@@ -162,12 +164,11 @@ module drawer(
       pieces(2)
       X(relative_width_gap)
       X(span(
-          width - 
-          relative_width_gap*2 -
+          shell_width - 
           shell_thickness
       ))
       logbox(
-          drawer_depth,
+          shell_depth,
           x=shell_thickness,
           h=shell_height,
           part=part,
@@ -177,10 +178,10 @@ module drawer(
 
       // Face
       add("face")
-      Y(drawer_depth)
+      Y(opening_depth)
       X(-face_trim_thickness/2)
       shaker_face(
-        width=width,
+        width=shell_width,
         height=nominal_height,
         trim_thickness=face_trim_thickness,
         trim_width=face_width,
