@@ -35,16 +35,16 @@ module frame_outline(
             subpart="bottom"
         );
         // Sides
-        pieces(2)
-        X(span(width - thickness))
-        logbox(
-            x=thickness,
-            y=depth - thickness,
-            h=height,
-            part=part,
-            material=material,
-            subpart="side"
-        );
+        //pieces(2)
+        //X(span(width - thickness))
+        //logbox(
+        //    x=thickness,
+        //    y=depth - thickness,
+        //    h=height,
+        //    part=part,
+        //    material=material,
+        //    subpart="side"
+        //);
     }
     children();
 }

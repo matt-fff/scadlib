@@ -135,33 +135,33 @@ module shaker_face(
       Z(-(height - trim_width)/2),
       X(width/2) 
     ){
-      //pieces(2)
-      //Z(span(height - trim_width))
-      //add()
-      //rail(
-      //  width=width - trim_width*2,
-      //  height=trim_width,
-      //  thickness=trim_thickness,
-      //  tenon_depth=tenon_depth,
-      //  tenon_thickness=tenon_thickness,
-      //  is_top=vRepeat(false, true),
-      //  part=part
-      //);
+      pieces(2)
+      Z(span(height - trim_width))
+      add()
+      rail(
+        width=width - trim_width*2,
+        height=trim_width,
+        thickness=trim_thickness,
+        tenon_depth=tenon_depth,
+        tenon_thickness=tenon_thickness,
+        is_top=vRepeat(false, true),
+        part=part
+      );
       children();
     }
 
     // Stiles
-    X(trim_width/2)
-    pieces(2)
-    X(span(width - trim_width))
-    stile(
-      width=trim_width,
-      height=height,
-      thickness=trim_thickness,
-      tenon_depth=tenon_depth,
-      tenon_thickness=tenon_thickness,
-      is_left=vRepeat(false, true),
-      part=part
-    );
+    //X(trim_width/2)
+    //pieces(2)
+    //X(span(width - trim_width))
+    //stile(
+    //  width=trim_width,
+    //  height=height,
+    //  thickness=trim_thickness,
+    //  tenon_depth=tenon_depth,
+    //  tenon_thickness=tenon_thickness,
+    //  is_left=vRepeat(false, true),
+    //  part=part
+    //);
     children();
 }

@@ -8,11 +8,16 @@ FACE_PANEL_MATERIAL = "1/2 plywood";
 FACE_PANEL_THICKNESS = inch_to_mm(0.5);
 
 DRAWER_WIDTH = DIVISION_WIDTH;
-DRAWER_WIDTH_GAP = 42 - FACE_WIDTH;
+DRAWER_WIDTH_GAP = 42;
 DRAWER_DEPTH = inch_to_mm(15);
 DRAWER_TOP_GAP = 10;
 DRAWER_BOTTOM_GAP = 14;
 DRAWER_BOTTOM_RECESS = 13;
+DRAWER_DEPTH_GAP = inch_to_mm(1/4);
+
+MIN_RUNNER_LEN = inch_to_mm(15 + 11/16);
+MAX_RUNNER_LEN = inch_to_mm(17);
+
 
 module drawer_bottom(
     depth=undef,
@@ -52,9 +57,9 @@ module drawer_bottom(
 }
 
 module drawer(
-    depth=undef,
-    height=undef,
-    width=undef,
+    opening_depth,
+    opening_width,
+    opening_height,
     width_gap=undef,
     top_gap=undef,
     bottom_gap=undef,
@@ -71,9 +76,6 @@ module drawer(
     face_width=undef,
     dado_depth=undef
 ) {
-    depth = val_or_default(depth, DRAWER_DEPTH);
-    height = val_or_default(height, DRAWER_HEIGHT);
-    width = val_or_default(width, DRAWER_WIDTH);
     width_gap = val_or_default(width_gap, DRAWER_WIDTH_GAP);
     top_gap = val_or_default(top_gap, DRAWER_TOP_GAP);
     bottom_gap = val_or_default(bottom_gap, DRAWER_BOTTOM_GAP);
@@ -89,22 +91,23 @@ module drawer(
     face_width = val_or_default(face_width, FACE_WIDTH);
     bottom_material = val_or_default(bottom_material, PANEL_MATERIAL);
 
+    // The real width gap is derived from the siding thickness 
+    relative_width_gap = opening_width - width_gap;
+
     part = "drawer";
     height_gap = bottom_gap + top_gap;
-    center_offset = (width - shell_thickness) / 2;
-    shell_height = height - height_gap - face_overlay*2;
+    center_offset = (opening_width - shell_thickness) / 2; // TODO probably wrong
+    shell_height = opening_height - height_gap;
 
     // Align everything with the bottom of the drawer
-    //Z((face_width - face_overlay)
-    //TOUP()
     assemble() { 
       // Rear
       add()
-      //Z(bottom_recess)
+      Z(bottom_thickness)
       X(center_offset)
       logbox(
           shell_thickness,
-          x=width - (width_gap + shell_thickness)*2,
+          x=width - (relative_width_gap + shell_thickness)*2,
           h=shell_height - bottom_recess,
           part=part,
           material=shell_material,
@@ -112,13 +115,19 @@ module drawer(
       );
 
       // Bottom panel
-      //Z(-(height + bottom_thickness)/2)
+      Z(
+        -(
+          shell_height 
+          - bottom_thickness
+        )/2 
+        + bottom_recess
+      )
       X(center_offset)
       add()
       drawer_bottom(
-        depth=depth,
+        depth=drawer_depth,
         width=width,
-        width_gap=width_gap,
+        width_gap=relative_width_gap,
         shell_thickness=shell_thickness,
         material=bottom_material,
         should_log=true,
@@ -126,9 +135,9 @@ module drawer(
       )
       remove()
       drawer_bottom(
-        depth=depth,
+        depth=drawer_depth,
         width=width,
-        width_gap=width_gap,
+        width_gap=relative_width_gap,
         shell_thickness=shell_thickness,
         material=bottom_material,
         should_log=false,
@@ -137,11 +146,11 @@ module drawer(
     
       // Interior front
       add()
-      Y(depth - shell_thickness)
+      Y(drawer_depth - shell_thickness)
       X(center_offset)
       logbox(
           shell_thickness,
-          x=width - (width_gap + shell_thickness)*2,
+          x=width - (relative_width_gap + shell_thickness)*2,
           h=shell_height,
           part=part,
           material=shell_material,
@@ -151,14 +160,14 @@ module drawer(
       // Sides
       add()
       pieces(2)
-      X(width_gap)
+      X(relative_width_gap)
       X(span(
           width - 
-          width_gap*2 -
+          relative_width_gap*2 -
           shell_thickness
       ))
       logbox(
-          depth,
+          drawer_depth,
           x=shell_thickness,
           h=shell_height,
           part=part,
@@ -167,11 +176,12 @@ module drawer(
       );
 
       // Face
-      add()
-      Y(depth)
+      add("face")
+      Y(drawer_depth)
+      X(-face_trim_thickness/2)
       shaker_face(
         width=width,
-        height=height,
+        height=nominal_height,
         trim_thickness=face_trim_thickness,
         trim_width=face_width,
         trim_material=face_trim_material,

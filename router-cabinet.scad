@@ -54,7 +54,7 @@ module cabinet(
       clear(orange)
       drawers(
         depth=depth,
-        height=height,
+        height=height - kick_height - top_thickness,
         width=width,
         face_width=face_width,
         face_trim_thickness=face_thickness,
@@ -62,7 +62,6 @@ module cabinet(
         dado_depth=dado_depth,
         panel_thickness=panel_thickness,
         carcas_thickness=carcas_thickness,
-        top_thickness=top_thickness,
         explode=explode
       );
     }
@@ -92,5 +91,5 @@ module cabinet(
     }
 }
 
-cabinet(explode=false, hide="drawer");
+cabinet(explode=false, hide="");
 
