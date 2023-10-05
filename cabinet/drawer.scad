@@ -101,7 +101,10 @@ module drawer(
     shell_width = opening_width - relative_width_gap;
     shell_depth = opening_depth - depth_gap;
 
-    // Align everything with the bottom of the drawer
+    X(
+      // TODO Might be bullshit
+      shell_thickness/2
+    ) 
     assemble() { 
       // Rear
       add()
@@ -162,7 +165,7 @@ module drawer(
       // Sides
       add()
       pieces(2)
-      X(relative_width_gap)
+      X(relative_width_gap/2)
       X(span(
           shell_width - 
           shell_thickness
@@ -177,12 +180,12 @@ module drawer(
       );
 
       // Face
-      add("face")
+      add()
       Y(opening_depth)
       X(-face_trim_thickness/2)
       shaker_face(
-        width=shell_width,
-        height=nominal_height,
+        opening_width=opening_width,
+        opening_height=opening_height,
         trim_thickness=face_trim_thickness,
         trim_width=face_width,
         trim_material=face_trim_material,

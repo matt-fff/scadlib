@@ -58,7 +58,7 @@ module face_plate_outline(
     rail_width = width;
     stile_height = height - face_width - carcas_thickness;
 
-    z_offset = -(face_width/2 - carcas_thickness);
+    face_carcas_diff = -(face_width/2 - carcas_thickness);
 
     //
     // FRAME OUTLINE
@@ -66,7 +66,7 @@ module face_plate_outline(
     TORIGHT()
     g(
         Y(depth - face_thickness),
-        Z(z_offset),
+        Z(face_carcas_diff),
         TOREAR()
     ){
         //
@@ -84,8 +84,6 @@ module face_plate_outline(
             material=material,
             subpart=vRepeat("bottom", "top")
         );
-        
-        
 
         g(
           Z((stile_height + face_width)/2)
@@ -109,9 +107,9 @@ module face_plate_outline(
           // FRAME VERTICAL DIVIDERS
           //
           
-          X(division_width - face_width/2)
+          X(division_width - face_width/2 + face_carcas_diff)
           pieces(2)
-          X(span(division_width))
+          X(span(division_width - face_carcas_diff*2))
           logbox(
               face_thickness,
               x=face_width,
@@ -146,19 +144,26 @@ module face_plate_storage(
     division_width = val_or_default(division_width, DIVISION_WIDTH);
     drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
 
-    z_offset = -(face_width/2 - carcas_thickness);
+    face_carcas_diff = -(face_width/2 - carcas_thickness);
 
     material = face_material;
     part = "face_plate_storage";
     TORIGHT()
     g(
         Y(depth - face_thickness),
-        Z(z_offset),
+        Z(face_carcas_diff),
         TOREAR()
     ){
         //
         // SIDE HORIZONTAL DIVIDERS
         //
+
+        side_drawer_width = (
+            division_width
+            - face_width
+            - face_width/2
+            + face_carcas_diff
+        );
         
         Z(
             height - 
@@ -169,25 +174,17 @@ module face_plate_storage(
         // Right Horizontal Divider
         logbox(
             face_thickness,
-            x=(
-                division_width - 
-                face_width - 
-                face_width/2
-            ),
+            x=side_drawer_width,
             h=face_width,
             part=part,
             material=material,
             subpart="right_divider"
         )
         // Left Horizontal Divider
-        X(division_width*2 - face_width/2)
+        X(division_width*2 - face_width/2 - face_carcas_diff)
         logbox(
             face_thickness,
-            x=(
-                division_width - 
-                face_width - 
-                face_width/2
-            ),
+            x=side_drawer_width,
             h=face_width,
             part=part,
             material=material,
@@ -197,28 +194,28 @@ module face_plate_storage(
         //
         // CENTER HORIZONTAL DIVIDERS
         //
+
+        middle_drawer_width = (
+            division_width
+            - face_width 
+            - face_carcas_diff*2
+        );
         
-        X(division_width + face_width/2)
-        Z(drawer_height - z_offset/2)
+        X(division_width + face_width/2 + face_carcas_diff)
+        Z(drawer_height - face_carcas_diff/2)
         logbox(
             face_thickness,
-            x=(
-                division_width - 
-                face_width
-            ),
+            x=middle_drawer_width,
             h=face_width,
             part=part,
             material=material,
             subpart=vRepeat("bottom_center_divider", "top_center_divider")
         )
         // Bottom Horizontal Divider
-        Z(drawer_height - z_offset/2)
+        Z(drawer_height - face_carcas_diff/2)
         logbox(
             face_thickness,
-            x=(
-                division_width - 
-                face_width
-            ),
+            x=middle_drawer_width,
             h=face_width,
             part=part,
             material=material,

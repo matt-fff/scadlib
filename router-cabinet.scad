@@ -19,6 +19,7 @@ module cabinet(
         drawer_height=undef,
         panel_thickness=undef,
         dado_depth=undef,
+        divisions=undef,
         explode=false,
         hide=""
 ){
@@ -33,14 +34,32 @@ module cabinet(
     drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
+    divisions = val_or_default(divisions, DIVISIONS);
+    division_width = width / divisions;
+
+    col1 = pink;
+    col2 = red;
+    col3 = orange;
+
+    if(!in("kick", hide)) {
+      TODOWN()
+      pieces(3)
+      clear(vRepeat(col1, col2, col3))
+      X(division_width * vRepeat(0, 1, 2))
+      kick_plate(
+          depth=depth,
+          height=kick_height,
+          width=division_width,
+          right_exposed=vRepeat(true, false, false),
+          left_exposed=vRepeat(false, false, true)
+      );
+    }
 
     if(!in("carcas", hide)) {
       carcas(
           depth=depth,
-          height=height,
+          height=height - kick_height - top_thickness,
           width=width,
-          kick_height=kick_height,
-          top_thickness=top_thickness,
           face_width=face_width,
           face_thickness=face_thickness,
           carcas_thickness=carcas_thickness,
@@ -91,5 +110,5 @@ module cabinet(
     }
 }
 
-cabinet(explode=false, hide="");
+cabinet(explode=true, hide="");
 

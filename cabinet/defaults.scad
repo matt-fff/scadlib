@@ -24,3 +24,6 @@ CARCAS_MATERIAL = "3/4 plywood";
 CARCAS_THICKNESS = inch_to_mm(0.75);
 
 DRAWER_HEIGHT = inch_to_mm(9);
+
+FACE_PANEL_MATERIAL = "1/2 mdf";
+FACE_PANEL_THICKNESS = inch_to_mm(0.5);
