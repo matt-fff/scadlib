@@ -24,7 +24,8 @@ module drawer_bottom(
     panel_thickness=undef,
     material=undef,
     dado_depth=undef,
-    should_log=true
+    should_log=true,
+    part = "drawer"
 ){
     depth = val_or_default(depth, DRAWER_DEPTH);
     width = val_or_default(width, DRAWER_WIDTH);
@@ -35,7 +36,6 @@ module drawer_bottom(
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     
 
-    part = "drawer";
     Y(shell_thickness)
     logbox(
         depth - shell_thickness*2 + dado_depth,
@@ -71,7 +71,8 @@ module drawer(
     face_panel_material=undef,
     face_overlay=undef,
     face_width=undef,
-    dado_depth=undef
+    dado_depth=undef,
+    part = "drawer"
 ) {
     depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
     top_gap = val_or_default(top_gap, DRAWER_TOP_GAP);
@@ -91,7 +92,6 @@ module drawer(
     // The real width gap is derived from the siding thickness 
     relative_width_gap = DRAWER_WIDTH_GAP - shell_thickness*2;
 
-    part = "drawer";
     height_gap = bottom_gap + top_gap;
     center_offset = (opening_width - shell_thickness) / 2; // TODO probably wrong
     shell_height = opening_height - height_gap;
@@ -189,7 +189,7 @@ module drawer(
         trim_overlay=face_overlay,
         panel_thickness=face_panel_thickness,
         panel_material=face_panel_material,
-        part="drawer_face"
+        part=part
       );
     }
     children();

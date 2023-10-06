@@ -38,7 +38,8 @@ module face_rail(
       h=height,
       part=part,
       subpart="rail",
-      should_log=should_log
+      should_log=should_log,
+      material=material
     );
 
     remove()
@@ -91,6 +92,7 @@ module face_stile(
       h=height,
       part=part,
       subpart="stile",
+      material=material,
       should_log=should_log
     );
 
@@ -127,6 +129,7 @@ module face_panel(
   tenon_depth = val_or_default(tenon_depth, TENON_DEPTH);
   tenon_thickness = val_or_default(tenon_thickness, TENON_THICKNESS);
   material = val_or_default(material, FACE_PANEL_MATERIAL);
+  trim_overlay = val_or_default(trim_overlay, FACE_OVERLAY);
   
   tenon_void_thickness = thickness - tenon_thickness;
 

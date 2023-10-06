@@ -14,7 +14,8 @@ from rich.console import Console
 from rich.table import Table
 
 console = Console()
-FILTER_PREFIX = 'ECHO: "dimensions: '
+DIM_PREFIX = 'ECHO: "dimensions: '
+HEADER_PREFIX = 'ECHO: "dim_header: '
 
 
 def mm_to_inches(mm: float) -> float:
@@ -32,6 +33,23 @@ def done(msg: Optional[str] = None) -> None:
         console.print(msg)
     console.print("Quitting...")
     quit(0)
+
+
+def parse_openscad_line(line: str) -> Optional[List[str]]:
+    clean_line = None
+    for prefix in (DIM_PREFIX, HEADER_PREFIX):
+        if line.startswith(prefix):
+            clean_line = line[len(prefix) : -1]
+
+    if not clean_line:
+        return None
+
+    try:
+        return json.loads(clean_line)
+    except json.JSONDecodeError:
+        console.print("[bold red]ERROR:[/bold red] Failed to parse line:\n", clean_line)
+
+    return None
 
 
 def get_dimensions(file_path: Path) -> List[Dict[str, Any]]:
@@ -54,17 +72,23 @@ def get_dimensions(file_path: Path) -> List[Dict[str, Any]]:
             )
 
     # Filter the output lines
+    field_names = None
     output_lines = stderr.decode("utf-8").splitlines()
-    processed_lines = []
+    rows = []
     for line in output_lines:
-        if not line.startswith(FILTER_PREFIX):
+        parsed_line = parse_openscad_line(line)
+        if parsed_line is None:
             continue
-        clean_line = line[len('ECHO: "dimensions: ') : -1]
-        parsed_line = json.loads(clean_line)
-        processed_lines.append(parsed_line)
 
-    # The first line is the field names, and the others are the rows
-    field_names, *rows = processed_lines
+        if line.startswith(HEADER_PREFIX):
+            field_names = parsed_line
+            continue
+
+        rows.append(parsed_line)
+
+    if field_names is None:
+        console.print("[bold red]ERROR:[/bold red] Failed to find dimension header")
+        exit(1)
 
     # Convert to a list of dictionaries
     dimensions = [dict(zip(field_names, row)) for row in rows]

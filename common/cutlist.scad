@@ -1,5 +1,9 @@
 include <constructive/constructive-compiled.scad> 
 
+module log_header() {
+    echo(str("dim_header: ", str(DIMENSION_HEADER)));
+}
+
 module log_dims(dimensions) {
     echo(str("dimensions: ", str(dimensions)));
 }
@@ -10,9 +14,9 @@ module logbox(
     y=undef,
     z=undef,
     h=heightInfo(),
-    part=undef,
-    subpart=undef,
-    material=undef,
+    part="",
+    subpart="",
+    material="",
     count=1,
     should_log=true
 ) {
@@ -31,13 +35,13 @@ module logbox(
         lz,
         count
     ];
-    assert(len(dimensions) == len(dimension_header));
+    assert(len(dimensions) == len(DIMENSION_HEADER));
     if (should_log) log_dims(dimensions);
     box(side=side, x=x, y=y, z=z, h=h);
     children();
 }
 
-dimension_header = [
+DIMENSION_HEADER = [
     "part",
     "subpart",
     "material",
@@ -46,4 +50,4 @@ dimension_header = [
     "lz", 
     "count"
 ];
-log_dims(dimension_header);
+log_header();

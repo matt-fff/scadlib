@@ -17,15 +17,11 @@ module door(
     face_panel_material=undef,
     face_overlay=undef,
     face_width=undef,
-    dado_depth=undef
+    dado_depth=undef,
+    part="door"
 ) {
+    carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
     face_trim_thickness = val_or_default(face_trim_thickness, FACE_THICKNESS);
-    face_trim_material = val_or_default(face_trim_material, FACE_MATERIAL);
-    face_panel_thickness = val_or_default(face_panel_thickness, FACE_PANEL_THICKNESS);
-    face_panel_material = val_or_default(face_panel_material, FACE_PANEL_MATERIAL);
-    face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
-    face_width = val_or_default(face_width, FACE_WIDTH);
-    part = "door";
 
     X(
       // TODO Might be bullshit
@@ -42,7 +38,7 @@ module door(
       trim_overlay=face_overlay,
       panel_thickness=face_panel_thickness,
       panel_material=face_panel_material,
-      part="door_face"
+      part=part
     );
     children();
 }

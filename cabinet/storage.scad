@@ -73,7 +73,8 @@ module middle_storage(
         face_panel_material=face_panel_material,
         face_overlay=face_overlay,
         dado_depth=dado_depth,
-        face_width=face_width
+        face_width=face_width,
+        part="mid_drawer_hi"
       );
       drawer(
         opening_depth,
@@ -93,7 +94,8 @@ module middle_storage(
         face_panel_material=face_panel_material,
         face_overlay=face_overlay,
         dado_depth=dado_depth,
-        face_width=face_width
+        face_width=face_width,
+        part="mid_drawer_low"
       );
 
       // TODO this offset is obviously nonsense
@@ -124,7 +126,8 @@ module middle_storage(
         face_panel_material=face_panel_material,
         face_overlay=face_overlay,
         dado_depth=dado_depth,
-        face_width=face_width
+        face_width=face_width,
+        part="mid_door"
       );
     }
     children();
@@ -208,7 +211,8 @@ module side_storage(
           face_panel_material=face_panel_material,
           face_overlay=face_overlay,
           dado_depth=dado_depth,
-          face_width=face_width
+          face_width=face_width,
+          part="side_drawer"
         );
 
 
@@ -236,7 +240,8 @@ module side_storage(
           face_panel_material=face_panel_material,
           face_overlay=face_overlay,
           dado_depth=dado_depth,
-          face_width=face_width
+          face_width=face_width,
+          part="side_door"
         );
     }
     children();
