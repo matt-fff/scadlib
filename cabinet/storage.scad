@@ -2,9 +2,10 @@ include <constructive/constructive-compiled.scad>
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 include <scadlib/cabinet/drawer.scad>
+include <scadlib/cabinet/door.scad>
 
 
-module middle_drawers(
+module middle_storage(
     opening_depth,
     opening_width,
     opening_height,
@@ -14,12 +15,14 @@ module middle_drawers(
     dado_depth=undef,
     panel_thickness=undef,
     panel_material=undef,
+    carcas_height=undef,
     carcas_thickness=undef,
     carcas_material=undef,
     bottom_material=undef,
     face_panel_thickness=undef,
     face_panel_material=undef,
     face_overlay=undef,
+    face_width=undef,
     depth_gap=undef,
     top_gap=undef,
     bottom_gap=undef,
@@ -31,6 +34,7 @@ module middle_drawers(
     depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
     bottom_gap = val_or_default(bottom_gap, DRAWER_BOTTOM_GAP);
     nominal_drawer_height = val_or_default(nominal_drawer_height, DRAWER_HEIGHT);
+    face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
 
     explode_offset = explode ? opening_depth : 0;
 
@@ -46,8 +50,7 @@ module middle_drawers(
             carcas_thickness/2
             + bottom_gap
         ),
-        TOREAR(),
-        TORIGHT()
+        TOREAR()
     ){
       //
       // CENTER DRAWERS
@@ -69,7 +72,8 @@ module middle_drawers(
         face_panel_thickness=face_panel_thickness,
         face_panel_material=face_panel_material,
         face_overlay=face_overlay,
-        dado_depth=dado_depth
+        dado_depth=dado_depth,
+        face_width=face_width
       );
       drawer(
         opening_depth,
@@ -88,17 +92,49 @@ module middle_drawers(
         face_panel_thickness=face_panel_thickness,
         face_panel_material=face_panel_material,
         face_overlay=face_overlay,
-        dado_depth=dado_depth
+        dado_depth=dado_depth,
+        face_width=face_width
+      );
+
+      // TODO this offset is obviously nonsense
+      door_z_offset = carcas_height - nominal_drawer_height*2 + 119;
+
+      door_height = (
+        carcas_height 
+        - nominal_drawer_height*2
+        - face_width 
+        - carcas_thickness
+      );
+      door_width = opening_width/2 - face_overlay;
+
+      //
+      // MIDDLE DOORS
+      //
+      Z(door_z_offset)
+      pieces(2)
+      X(vRepeat(0, opening_width/2 + face_overlay))
+      door(
+        opening_depth,
+        door_width,
+        door_height,
+        carcas_thickness=carcas_thickness,
+        face_trim_thickness=face_trim_thickness,
+        face_trim_material=face_trim_material,
+        face_panel_thickness=face_panel_thickness,
+        face_panel_material=face_panel_material,
+        face_overlay=face_overlay,
+        dado_depth=dado_depth,
+        face_width=face_width
       );
     }
     children();
 }
 
-module side_drawer(
+module side_storage(
     opening_depth,
     opening_width,
     opening_height,
-    cabinet_height=undef,
+    carcas_height=undef,
     face_width=undef,
     face_trim_thickness=undef,
     face_trim_material=undef,
@@ -119,7 +155,7 @@ module side_drawer(
     bottom_recess=undef,
     explode=false
 ){
-    cabinet_height = val_or_default(cabinet_height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
+    carcas_height = val_or_default(carcas_height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
     face_width = val_or_default(face_width, FACE_WIDTH);
     face_trim_thickness = val_or_default(face_trim_thickness, FACE_THICKNESS);
     nominal_drawer_height = val_or_default(nominal_drawer_height, DRAWER_HEIGHT);
@@ -142,19 +178,19 @@ module side_drawer(
             + depth_gap
             + explode_offset
         ),
-        Z(
-            // TODO offsets probably bullshit
-            cabinet_height
-            - nominal_drawer_height
-            - (nominal_drawer_height - actual_drawer_height)/2
-            + bottom_gap
-        ),
         TOREAR()
     ){
         //
         // SIDE DRAWERS
         //
         
+        Z(
+            // TODO offsets probably bullshit
+            carcas_height
+            - nominal_drawer_height
+            - (nominal_drawer_height - actual_drawer_height)/2
+            + bottom_gap
+        )
         drawer(
           opening_depth,
           opening_width,
@@ -171,13 +207,42 @@ module side_drawer(
           face_panel_thickness=face_panel_thickness,
           face_panel_material=face_panel_material,
           face_overlay=face_overlay,
-          dado_depth=dado_depth
+          dado_depth=dado_depth,
+          face_width=face_width
+        );
+
+
+        // TODO this offset is obviously nonsense
+        door_z_offset = 227;
+
+        door_height = (
+          carcas_height 
+          - nominal_drawer_height 
+          - face_width 
+          - carcas_thickness
+        );
+        //
+        // SIDE DOORS
+        //
+        Z(door_z_offset)
+        door(
+          opening_depth,
+          opening_width,
+          door_height,
+          carcas_thickness=carcas_thickness,
+          face_trim_thickness=face_trim_thickness,
+          face_trim_material=face_trim_material,
+          face_panel_thickness=face_panel_thickness,
+          face_panel_material=face_panel_material,
+          face_overlay=face_overlay,
+          dado_depth=dado_depth,
+          face_width=face_width
         );
     }
     children();
 }
 
-module drawers(
+module storage(
     depth=undef,
     height=undef,
     width=undef,
@@ -221,7 +286,7 @@ module drawers(
   X( 
     division_width + carcas_thickness 
   )
-  middle_drawers(
+  middle_storage(
     opening_depth,
     opening_width_middle,
     opening_height,
@@ -231,6 +296,7 @@ module drawers(
     dado_depth=dado_depth,
     panel_thickness=panel_thickness,
     panel_material=panel_material,
+    carcas_height=height,
     carcas_thickness=carcas_thickness,
     carcas_material=carcas_material,
     bottom_material=bottom_material,
@@ -238,20 +304,19 @@ module drawers(
     face_panel_material=face_panel_material,
     face_overlay=face_overlay,
     depth_gap=depth_gap,
-    explode=explode
+    explode=explode,
+    face_width=face_width
   );
 
   side_split = (width - division_width)/2; 
-  //X(side_split + (face_width - carcas_thickness))
-  //X((side_ext_offset + side_int_offset))
   X(face_width)
   pieces(2)
   X(span(width - division_width - carcas_thickness))
-  side_drawer(
+  side_storage(
     opening_depth,
     opening_width_sides,
     opening_height,
-    cabinet_height=height,
+    carcas_height=height,
     face_width=face_width,
     face_trim_thickness=face_trim_thickness,
     face_trim_material=face_trim_material,
@@ -269,3 +334,4 @@ module drawers(
     explode=explode
   );
 }
+

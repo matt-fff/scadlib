@@ -4,9 +4,6 @@ include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 include <scadlib/cabinet/shaker.scad>
 
-FACE_PANEL_MATERIAL = "1/2 plywood";
-FACE_PANEL_THICKNESS = inch_to_mm(0.5);
-
 DRAWER_WIDTH = DIVISION_WIDTH;
 DRAWER_WIDTH_GAP = 42;
 DRAWER_DEPTH = inch_to_mm(15);

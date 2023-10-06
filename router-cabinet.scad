@@ -40,8 +40,10 @@ module cabinet(
     col1 = pink;
     col2 = red;
     col3 = orange;
+    explode_offset = explode ? 150 : 0;
 
     if(!in("kick", hide)) {
+      Z(-explode_offset)
       TODOWN()
       pieces(3)
       clear(vRepeat(col1, col2, col3))
@@ -65,13 +67,14 @@ module cabinet(
           carcas_thickness=carcas_thickness,
           drawer_height=drawer_height,
           panel_thickness=panel_thickness,
-          dado_depth=dado_depth
+          dado_depth=dado_depth,
+          explode=explode
       );
     }
-    if(!in("drawer", hide)) {
+    if(!in("storage", hide)) {
       Z(kick_height)
-      clear(orange)
-      drawers(
+      clear(gold)
+      storage(
         depth=depth,
         height=height - kick_height - top_thickness,
         width=width,
@@ -85,6 +88,7 @@ module cabinet(
       );
     }
     if(!in("top", hide)) {
+      Z(explode_offset)
       clear()
       Z(
           height -
@@ -98,7 +102,8 @@ module cabinet(
       );
     }
     if(!in("face", hide)) {
-      clear()
+      Y(explode_offset)
+      clear(beige)
       face(
           depth=depth,
           height=height - kick_height - top_thickness,
@@ -110,5 +115,5 @@ module cabinet(
     }
 }
 
-cabinet(explode=true, hide="");
+cabinet(explode=false, hide="");
 
