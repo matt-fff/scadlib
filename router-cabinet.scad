@@ -5,7 +5,9 @@ include <scadlib/cabinet/defaults.scad>
 include <scadlib/cabinet/carcas.scad>
 include <scadlib/cabinet/face.scad>
 include <scadlib/cabinet/storage.scad>
+include <scadlib/cabinet/kick_plate.scad>
 include <scadlib/cabinet/top.scad>
+include <scadlib/cabinet/back_panel.scad>
 
 module cabinet(
         depth=undef,
@@ -66,6 +68,16 @@ module cabinet(
           face_thickness=face_thickness,
           carcas_thickness=carcas_thickness,
           drawer_height=drawer_height,
+          panel_thickness=panel_thickness,
+          dado_depth=dado_depth,
+          explode=explode
+      );
+    }
+    if(!in("back_panel", hide)) {
+      back_panel_set(
+          height=height - kick_height - top_thickness,
+          width=width,
+          carcas_thickness=carcas_thickness,
           panel_thickness=panel_thickness,
           dado_depth=dado_depth,
           explode=explode

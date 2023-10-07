@@ -1,7 +1,7 @@
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
 include <scadlib/cabinet/frame.scad>
-include <scadlib/cabinet/kick_plate.scad>
+include <scadlib/cabinet/back_panel.scad>
 
 module carcas(
     depth=undef,
@@ -26,13 +26,11 @@ module carcas(
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     division_width= val_or_default(division_width, DIVISION_WIDTH);
-    explode_offset = explode ? 75 : 0;
+    explode_offset = explode ? 100 : 0;
 
     col1 = pink;
     col2 = red;
     col3 = orange;
-    Y(-explode_offset)
-    Z(explode_offset)
     g(TOUP()) {
         clear(gray)
         pieces(3)
@@ -41,16 +39,9 @@ module carcas(
             depth=depth,
             height=height,
             width=division_width,
-            col=vRepeat(col1, col2, col3)
-        )
-        // Add the actual back panel
-        back_panel(
-            height=height,
-            width=division_width,
-            carcas_thickness=carcas_thickness,
-            col=vRepeat(col1, col2, col3)
+            col=vRepeat(col1, col2, col3),
+            explode=explode
         );
-        
     }
     clear(gray)
     frame_storage(
@@ -84,10 +75,9 @@ module carcas(
                     height=height, // intentionally large
                     width=division_width,
                     carcas_thickness=carcas_thickness,
-                    col=vRepeat(col1, col2, col3),
-                    should_log=false,
+                    panel_thickness=panel_thickness,
                     dado_depth=dado_depth,
-                    panel_thickness=panel_thickness
+                    should_log=false
                 );
             }
         }
