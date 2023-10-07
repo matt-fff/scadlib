@@ -30,6 +30,7 @@ module face_rail(
   tenon_void_thickness = thickness - tenon_thickness*2;
 
 
+  Y(-tenon_void_thickness)
   assemble(){
     add()
     logbox(
@@ -84,6 +85,7 @@ module face_stile(
   material = val_or_default(material, FACE_MATERIAL);
   
   tenon_void_thickness = thickness - tenon_thickness*2;
+  Y(-tenon_void_thickness)
   assemble(){
     add()
     logbox(
@@ -139,7 +141,7 @@ module face_panel(
   overlay_offset = (trim_width - tenon_depth);
   width = opening_width - overlay_offset;
   height = opening_height - overlay_offset;
-
+  Y(-tenon_void_thickness)
   X(opening_width/2)
   assemble(){
     add()
