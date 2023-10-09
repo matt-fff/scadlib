@@ -8,7 +8,7 @@ from fractions import Fraction
 from collections import defaultdict
 from itertools import groupby
 from operator import itemgetter
-from typing import Optional, List, Any, Dict, Iterable
+from typing import Optional, List, Any, Dict, Iterable, Union
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
@@ -131,6 +131,16 @@ def consolidate_dimensions(dimensions: List[Dict[str, Any]]) -> List[Dict[str, A
     return grouped_dimensions
 
 
+def format_num(
+    number: Union[float, int], fraction: bool = True, metric: bool = False
+) -> str:
+    if not metric:
+        number = mm_to_inches(number)
+    if fraction:
+        return fractionalize(number)
+    return f"{number:.4f}"
+
+
 def fractionalize(number: float) -> str:
     whole_part = int(number)
     fractional_part = number - whole_part
@@ -151,9 +161,12 @@ def fractionalize(number: float) -> str:
     return result
 
 
-def get_table(dimensions: Iterable[Dict[str, Any]], metric: bool = False) -> Table:
+def get_table(
+    dimensions: Iterable[Dict[str, Any]], fraction: bool = False, metric: bool = False
+) -> Table:
     unit = "mm" if metric else "in"
     table = Table(title="Cut List", show_lines=True)
+    table.add_column("Num", style="white")
     table.add_column("Material", style="cyan")
 
     table.add_column(f"X ({unit})", style="magenta")
@@ -162,20 +175,18 @@ def get_table(dimensions: Iterable[Dict[str, Any]], metric: bool = False) -> Tab
     table.add_column("Count", style="red")
     table.add_column("Parts", style="pink1")
 
-    for row in sorted(
-        dimensions, key=lambda x: (x["material"], x["lz"], x["lx"], x["ly"])
+    for idx, row in enumerate(
+        sorted(dimensions, key=lambda x: (x["material"], x["lz"], x["lx"], x["ly"]))
     ):
         part_counts = "\n".join(
             [f"{key}:{count}" for key, count in row["part_counts"].items()]
         )
 
         dims = (row["lz"], row["lx"], row["ly"])
-        if metric:
-            dims = tuple(f"{dim:.4f}" for dim in dims)
-        else:
-            dims = tuple(fractionalize(mm_to_inches(dim)) for dim in dims)
+        dims = tuple(format_num(dim, fraction=fraction, metric=metric) for dim in dims)
 
         table.add_row(
+            str(idx + 1),
             row["material"],
             *dims,
             str(row["count"]),
@@ -185,10 +196,11 @@ def get_table(dimensions: Iterable[Dict[str, Any]], metric: bool = False) -> Tab
 
 
 def main(args: argparse.Namespace) -> None:
-    if not args.file:
+    file = args.scadfile
+    if not file:
         done("No file specified.")
 
-    file_path = Path(args.file)
+    file_path = Path(file)
     if not file_path.exists():
         raise FileNotFoundError(f"{file_path} does not exist.")
 
@@ -199,7 +211,7 @@ def main(args: argparse.Namespace) -> None:
     if args.stock:
         consolidated = filter(lambda row: row["material"] == args.stock, consolidated)
 
-    table = get_table(consolidated)
+    table = get_table(consolidated, fraction=args.fraction, metric=args.metric)
     console.print(table)
 
 
@@ -210,7 +222,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-f", "--file", type=str, help="The source openscad file for dimensions"
+        "scadfile", type=str, help="The source openscad file for dimensions"
     )
 
     parser.add_argument(
@@ -222,6 +234,13 @@ if __name__ == "__main__":
         "--metric",
         default=False,
         help="If true, will output data in millimeters",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-f",
+        "--fraction",
+        default=False,
+        help="If true, will output data as a fraction",
         action="store_true",
     )
 
