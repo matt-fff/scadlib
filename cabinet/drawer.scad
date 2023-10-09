@@ -132,6 +132,7 @@ module drawer(
         width_gap=relative_width_gap,
         shell_thickness=shell_thickness,
         material=bottom_material,
+        part=part,
         should_log=true,
         dado_depth=dado_depth
       )
@@ -142,6 +143,7 @@ module drawer(
         width_gap=relative_width_gap,
         shell_thickness=shell_thickness,
         material=bottom_material,
+        part=part,
         should_log=false,
         dado_depth=dado_depth
       );
