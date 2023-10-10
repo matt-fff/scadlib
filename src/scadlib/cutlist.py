@@ -4,11 +4,12 @@ import argparse
 import subprocess
 import tempfile
 import json
+import csv
 from fractions import Fraction
 from collections import defaultdict
 from itertools import groupby
 from operator import itemgetter
-from typing import Optional, List, Any, Dict, Iterable, Union
+from typing import Optional, List, Any, Dict, Iterable, Union, Generator
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
@@ -16,6 +17,23 @@ from rich.table import Table
 console = Console()
 DIM_PREFIX = 'ECHO: "dimensions: '
 HEADER_PREFIX = 'ECHO: "dim_header: '
+EXPORT_DELIMITERS: Dict[Optional[str], str] = {".csv": ",", ".tsv": "\t"}
+
+
+def user_input() -> str:
+    return console.input(prompt="[bold blue]>>>[/bold blue] ")
+
+
+def info(*message: str) -> None:
+    return console.print("[bold white]INFO:[/bold white] ", *message)
+
+
+def error(*message: str) -> None:
+    return console.print("[bold red]ERROR:[/bold red] ", *message)
+
+
+def warn(*message: str) -> None:
+    return console.print("[bold orange]WARN:[/bold orange] ", *message)
 
 
 def mm_to_inches(mm: float) -> float:
@@ -47,7 +65,7 @@ def parse_openscad_line(line: str) -> Optional[List[str]]:
     try:
         return json.loads(clean_line)
     except json.JSONDecodeError:
-        console.print("[bold red]ERROR:[/bold red] Failed to parse line:\n", clean_line)
+        error("Failed to parse line:\n", line)
 
     return None
 
@@ -87,7 +105,7 @@ def get_dimensions(file_path: Path) -> List[Dict[str, Any]]:
         rows.append(parsed_line)
 
     if field_names is None:
-        console.print("[bold red]ERROR:[/bold red] Failed to find dimension header")
+        error("Failed to find dimension header")
         exit(1)
 
     # Convert to a list of dictionaries
@@ -96,7 +114,9 @@ def get_dimensions(file_path: Path) -> List[Dict[str, Any]]:
     return dimensions
 
 
-def consolidate_dimensions(dimensions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def consolidate_dimensions(
+    dimensions: List[Dict[str, Any]]
+) -> Generator[Dict[str, Any], None, None]:
     # Normalize the 'lx', 'ly', 'lz'
     for row in dimensions:
         row_dims = sorted([row["lx"], row["ly"], row["lz"]])
@@ -105,7 +125,6 @@ def consolidate_dimensions(dimensions: List[Dict[str, Any]]) -> List[Dict[str, A
     # Sort the dimensions based on the grouping keys
     dimensions.sort(key=itemgetter("material", "lx", "ly", "lz"))
 
-    grouped_dimensions = []
     for _, group in groupby(dimensions, key=itemgetter("material", "lx", "ly", "lz")):
         group = list(group)
         first_row = group[0]
@@ -113,9 +132,9 @@ def consolidate_dimensions(dimensions: List[Dict[str, Any]]) -> List[Dict[str, A
         # Initialize the aggregated row
         aggregated_row = {
             "material": first_row["material"],
-            "lx": first_row["lx"],
-            "ly": first_row["ly"],
-            "lz": first_row["lz"],
+            "thickness": first_row["lx"],
+            "width": first_row["ly"],
+            "length": first_row["lz"],
             "count": 0,
             "part_counts": defaultdict(int),
         }
@@ -126,9 +145,7 @@ def consolidate_dimensions(dimensions: List[Dict[str, Any]]) -> List[Dict[str, A
             part_key = f"{row['part']}-{row['subpart']}"
             aggregated_row["part_counts"][part_key] += row["count"]
 
-        grouped_dimensions.append(aggregated_row)
-
-    return grouped_dimensions
+        yield aggregated_row
 
 
 def format_num(
@@ -161,71 +178,84 @@ def fractionalize(number: float) -> str:
     return result
 
 
-def get_table(
-    dimensions: Iterable[Dict[str, Any]], fraction: bool = False, metric: bool = False
-) -> Table:
+def get_table(dimensions: Iterable[Dict[str, Any]], metric: bool = False) -> Table:
     unit = "mm" if metric else "in"
     table = Table(title="Cut List", show_lines=True)
     table.add_column("Num", style="white")
     table.add_column("Material", style="cyan")
 
-    table.add_column(f"X ({unit})", style="magenta")
-    table.add_column(f"Y ({unit})", style="green")
-    table.add_column(f"Z ({unit})", style="yellow")
+    table.add_column(f"Thickness ({unit})", style="magenta")
+    table.add_column(f"Width ({unit})", style="green")
+    table.add_column(f"Length ({unit})", style="yellow")
     table.add_column("Count", style="red")
     table.add_column("Parts", style="pink1")
 
-    for idx, row in enumerate(
-        sorted(dimensions, key=lambda x: (x["material"], x["lz"], x["lx"], x["ly"]))
-    ):
-        part_counts = "\n".join(
-            [f"{key}:{count}" for key, count in row["part_counts"].items()]
-        )
-
-        dims = (row["lz"], row["lx"], row["ly"])
-        dims = tuple(format_num(dim, fraction=fraction, metric=metric) for dim in dims)
-
+    for idx, row in enumerate(dimensions):
         table.add_row(
             str(idx + 1),
             row["material"],
-            *dims,
+            str(row["thickness"]),
+            str(row["width"]),
+            str(row["length"]),
             str(row["count"]),
-            part_counts,
+            row["parts"],
         )
     return table
+
+
+def export(dimensions: Iterable[Dict[str, Any]], path: Path) -> None:
+    rows = list(dimensions)
+    if not rows:
+        error("No rows to export")
+        exit(1)
+
+    file_extension = path.suffix.lower() if path.suffix else None
+    delimiter = EXPORT_DELIMITERS.get(file_extension)
+
+    if not delimiter:
+        error(
+            "Cannot detect export format.",
+            "Unknown file extension: ",
+            str(file_extension),
+        )
+        exit(1)
+
+    with open(path, "w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=rows[0].keys(), delimiter=delimiter)
+        writer.writeheader()
+        writer.writerows(rows)
+    info("Export complete: ", path)
+
 
 def format_output(
-    dimensions: Iterable[Dict[str, Any]], fraction: bool = False, metric: bool = False
-) -> Table:
-    unit = "mm" if metric else "in"
-    # table = Table(title="Cut List", show_lines=True)
-    # table.add_column("Num", style="white")
-    # table.add_column("Material", style="cyan")
-
-    # table.add_column(f"X ({unit})", style="magenta")
-    # table.add_column(f"Y ({unit})", style="green")
-    # table.add_column(f"Z ({unit})", style="yellow")
-    # table.add_column("Count", style="red")
-    # table.add_column("Parts", style="pink1")
-
-    for idx, row in enumerate(
-        sorted(dimensions, key=lambda x: (x["material"], x["lz"], x["lx"], x["ly"]))
+    dimensions: Iterable[Dict[str, Any]],
+    fraction: bool = False,
+    metric: bool = False,
+    stock: Optional[str] = None,
+) -> Generator[Dict[str, Any], None, None]:
+    for row in sorted(
+        dimensions,
+        key=lambda x: (x["material"], x["thickness"], x["width"], x["length"]),
     ):
+        # skip nonmatching material, if specified
+        if stock and row["material"] != stock:
+            continue
+
         part_counts = "\n".join(
             [f"{key}:{count}" for key, count in row["part_counts"].items()]
         )
 
-        dims = (row["lz"], row["lx"], row["ly"])
-        dims = tuple(format_num(dim, fraction=fraction, metric=metric) for dim in dims)
+        dims = {
+            key: format_num(row[key], fraction=fraction, metric=metric)
+            for key in ["thickness", "width", "length"]
+        }
 
-        table.add_row(
-            str(idx + 1),
-            row["material"],
-            *dims,
-            str(row["count"]),
-            part_counts,
-        )
-    return table
+        yield {
+            "material": row["material"],
+            "count": row["count"],
+            "parts": part_counts,
+            **dims,
+        }
 
 
 def main(args: argparse.Namespace) -> None:
@@ -240,15 +270,16 @@ def main(args: argparse.Namespace) -> None:
     console.print(f"Processing file: {file_path}")
     dimensions = get_dimensions(file_path)
     consolidated = consolidate_dimensions(dimensions)
-
-    if args.stock:
-        consolidated = filter(lambda row: row["material"] == args.stock, consolidated)
-
-    table = get_table(consolidated, fraction=args.fraction, metric=args.metric)
-    console.print(table)
+    formatted = format_output(
+        consolidated, fraction=args.fraction, metric=args.metric, stock=args.stock
+    )
 
     if args.export:
-        
+        export_path = Path(args.export)
+        return export(formatted, export_path)
+
+    table = get_table(formatted)
+    console.print(table)
 
 
 if __name__ == "__main__":

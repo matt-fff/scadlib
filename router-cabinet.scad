@@ -128,7 +128,7 @@ module cabinet(
 }
 
 cabinet(
-  face_width=inch_to_mm(1.685),
+  //face_width=inch_to_mm(1.685),
   explode=false,
   hide="");
 

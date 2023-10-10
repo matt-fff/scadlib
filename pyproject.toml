@@ -15,4 +15,4 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = ["ipdb~=0.13.13"]
+dev-dependencies = ["ipdb~=0.13.13", "black~=23.9.1"]
