@@ -194,6 +194,39 @@ def get_table(
         )
     return table
 
+def format_output(
+    dimensions: Iterable[Dict[str, Any]], fraction: bool = False, metric: bool = False
+) -> Table:
+    unit = "mm" if metric else "in"
+    # table = Table(title="Cut List", show_lines=True)
+    # table.add_column("Num", style="white")
+    # table.add_column("Material", style="cyan")
+
+    # table.add_column(f"X ({unit})", style="magenta")
+    # table.add_column(f"Y ({unit})", style="green")
+    # table.add_column(f"Z ({unit})", style="yellow")
+    # table.add_column("Count", style="red")
+    # table.add_column("Parts", style="pink1")
+
+    for idx, row in enumerate(
+        sorted(dimensions, key=lambda x: (x["material"], x["lz"], x["lx"], x["ly"]))
+    ):
+        part_counts = "\n".join(
+            [f"{key}:{count}" for key, count in row["part_counts"].items()]
+        )
+
+        dims = (row["lz"], row["lx"], row["ly"])
+        dims = tuple(format_num(dim, fraction=fraction, metric=metric) for dim in dims)
+
+        table.add_row(
+            str(idx + 1),
+            row["material"],
+            *dims,
+            str(row["count"]),
+            part_counts,
+        )
+    return table
+
 
 def main(args: argparse.Namespace) -> None:
     file = args.scadfile
@@ -213,6 +246,9 @@ def main(args: argparse.Namespace) -> None:
 
     table = get_table(consolidated, fraction=args.fraction, metric=args.metric)
     console.print(table)
+
+    if args.export:
+        
 
 
 if __name__ == "__main__":
@@ -242,6 +278,10 @@ if __name__ == "__main__":
         default=False,
         help="If true, will output data as a fraction",
         action="store_true",
+    )
+
+    parser.add_argument(
+        "-e", "--export", type=str, help="Optional export file. Supports tsv and csv."
     )
 
     args = parser.parse_args()
