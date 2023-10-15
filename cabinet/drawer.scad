@@ -25,7 +25,7 @@ module drawer_bottom(
     material=undef,
     dado_depth=undef,
     should_log=true,
-    part = "drawer"
+    part="drawer"
 ){
     depth = val_or_default(depth, DRAWER_DEPTH);
     width = val_or_default(width, DRAWER_WIDTH);
@@ -72,7 +72,8 @@ module drawer(
     face_overlay=undef,
     face_width=undef,
     dado_depth=undef,
-    part = "drawer"
+    part="drawer",
+    hide=""
 ) {
     depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
     top_gap = val_or_default(top_gap, DRAWER_TOP_GAP);
@@ -103,96 +104,100 @@ module drawer(
       shell_thickness/2
     ) 
     assemble() { 
-      // Rear
-      add()
-      Z(bottom_thickness)
-      X(center_offset)
-      logbox(
-          shell_thickness,
-          x=shell_width - shell_thickness*2,
-          h=shell_height - bottom_recess,
-          part=part,
-          material=shell_material,
-          subpart="rear"
-      );
+      if(!in("carcas", hide)) {
+        // Rear
+        add()
+        Z(bottom_thickness)
+        X(center_offset)
+        logbox(
+            shell_thickness,
+            x=shell_width - shell_thickness*2,
+            h=shell_height - bottom_recess,
+            part=part,
+            material=shell_material,
+            subpart="rear"
+        );
 
-      // Bottom panel
-      Z(
-        -(
-          shell_height 
-          - bottom_thickness
-        )/2 
-        + bottom_recess
-      )
-      X(center_offset)
-      add()
-      drawer_bottom(
-        depth=shell_depth,
-        width=shell_width,
-        width_gap=relative_width_gap,
-        shell_thickness=shell_thickness,
-        material=bottom_material,
-        part=part,
-        should_log=true,
-        dado_depth=dado_depth
-      )
-      remove()
-      drawer_bottom(
-        depth=shell_depth,
-        width=shell_width,
-        width_gap=relative_width_gap,
-        shell_thickness=shell_thickness,
-        material=bottom_material,
-        part=part,
-        should_log=false,
-        dado_depth=dado_depth
-      );
-    
-      // Interior front
-      add()
-      Y(shell_depth - shell_thickness)
-      X(center_offset)
-      logbox(
-          shell_thickness,
-          x=shell_width - shell_thickness*2,
-          h=shell_height,
+        // Bottom panel
+        Z(
+          -(
+            shell_height 
+            - bottom_thickness
+          )/2 
+          + bottom_recess
+        )
+        X(center_offset)
+        add()
+        drawer_bottom(
+          depth=shell_depth,
+          width=shell_width,
+          width_gap=relative_width_gap,
+          shell_thickness=shell_thickness,
+          material=bottom_material,
           part=part,
-          material=shell_material,
-          subpart="front"
-      );
+          should_log=true,
+          dado_depth=dado_depth
+        )
+        remove()
+        drawer_bottom(
+          depth=shell_depth,
+          width=shell_width,
+          width_gap=relative_width_gap,
+          shell_thickness=shell_thickness,
+          material=bottom_material,
+          part=part,
+          should_log=false,
+          dado_depth=dado_depth
+        );
+      
+        // Interior front
+        add()
+        Y(shell_depth - shell_thickness)
+        X(center_offset)
+        logbox(
+            shell_thickness,
+            x=shell_width - shell_thickness*2,
+            h=shell_height,
+            part=part,
+            material=shell_material,
+            subpart="front"
+        );
 
-      // Sides
-      add()
-      pieces(2)
-      X(relative_width_gap/2)
-      X(span(
-          shell_width - 
-          shell_thickness
-      ))
-      logbox(
-          shell_depth,
-          x=shell_thickness,
-          h=shell_height,
-          part=part,
-          material=shell_material,
-          subpart="side"
-      );
+        // Sides
+        add()
+        pieces(2)
+        X(relative_width_gap/2)
+        X(span(
+            shell_width - 
+            shell_thickness
+        ))
+        logbox(
+            shell_depth,
+            x=shell_thickness,
+            h=shell_height,
+            part=part,
+            material=shell_material,
+            subpart="side"
+        );
+      }
 
       // Face
-      add()
-      Y(opening_depth)
-      X(-face_trim_thickness/2)
-      shaker_face(
-        opening_width=opening_width,
-        opening_height=opening_height,
-        trim_thickness=face_trim_thickness,
-        trim_width=face_width,
-        trim_material=face_trim_material,
-        trim_overlay=face_overlay,
-        panel_thickness=face_panel_thickness,
-        panel_material=face_panel_material,
-        part=part
-      );
+      if(!in("face", hide)) {
+        add()
+        Y(opening_depth)
+        X(-face_trim_thickness/2)
+        shaker_face(
+          opening_width=opening_width,
+          opening_height=opening_height,
+          trim_thickness=face_trim_thickness,
+          trim_width=face_width,
+          trim_material=face_trim_material,
+          trim_overlay=face_overlay,
+          panel_thickness=face_panel_thickness,
+          panel_material=face_panel_material,
+          part=part
+        );
+      }
     }
     children();
 }

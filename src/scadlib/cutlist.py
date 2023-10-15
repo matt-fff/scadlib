@@ -132,9 +132,9 @@ def consolidate_dimensions(
         # Initialize the aggregated row
         aggregated_row = {
             "material": first_row["material"],
-            "thickness": first_row["lx"],
-            "width": first_row["ly"],
-            "length": first_row["lz"],
+            "thickness": first_row["lz"],
+            "width": first_row["lx"],
+            "length": first_row["ly"],
             "count": 0,
             "part_counts": defaultdict(int),
         }
@@ -203,7 +203,9 @@ def get_table(dimensions: Iterable[Dict[str, Any]], metric: bool = False) -> Tab
     return table
 
 
-def export(dimensions: Iterable[Dict[str, Any]], path: Path) -> None:
+def export(
+    dimensions: Iterable[Dict[str, Any]], path: Path, header: Optional[List[str]] = None
+) -> None:
     rows = list(dimensions)
     if not rows:
         error("No rows to export")
@@ -220,11 +222,17 @@ def export(dimensions: Iterable[Dict[str, Any]], path: Path) -> None:
         )
         exit(1)
 
+    if not header:
+        header = list(rows[0].keys())
+
+    # Ensure every row has all keys from header, fill in missing keys with ''
+    cleaned_rows = [{**dict.fromkeys(header, ""), **row} for row in rows]
+
     with open(path, "w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=rows[0].keys(), delimiter=delimiter)
+        writer = csv.DictWriter(file, fieldnames=header, delimiter=delimiter)
         writer.writeheader()
-        writer.writerows(rows)
-    info("Export complete: ", path)
+        writer.writerows(cleaned_rows)
+    info("Export complete: ", str(path))
 
 
 def format_output(
@@ -276,7 +284,7 @@ def main(args: argparse.Namespace) -> None:
 
     if args.export:
         export_path = Path(args.export)
-        return export(formatted, export_path)
+        return export(formatted, export_path, header=args.export_header)
 
     table = get_table(formatted)
     console.print(table)
@@ -313,6 +321,13 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "-e", "--export", type=str, help="Optional export file. Supports tsv and csv."
+    )
+    parser.add_argument(
+        "-eh",
+        "--export-header",
+        nargs="+",
+        type=str,
+        help="Optional header ordering for export file.",
     )
 
     args = parser.parse_args()

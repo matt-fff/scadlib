@@ -96,6 +96,7 @@ module cabinet(
         dado_depth=dado_depth,
         panel_thickness=panel_thickness,
         carcas_thickness=carcas_thickness,
+        hide=hide,
         explode=explode
       );
     }
@@ -128,7 +129,7 @@ module cabinet(
 }
 
 cabinet(
-  //face_width=inch_to_mm(1.685),
+  face_width=inch_to_mm(1.685),
   explode=false,
-  hide="");
+  hide="carcas");
 

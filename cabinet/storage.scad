@@ -27,6 +27,7 @@ module middle_storage(
     top_gap=undef,
     bottom_gap=undef,
     bottom_recess=undef,
+    hide="",
     explode=false
 ){
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
@@ -74,7 +75,8 @@ module middle_storage(
         face_overlay=face_overlay,
         dado_depth=dado_depth,
         face_width=face_width,
-        part="mid_drawer_hi"
+        part="mid_drawer_hi",
+        hide=hide
       );
       drawer(
         opening_depth,
@@ -95,7 +97,8 @@ module middle_storage(
         face_overlay=face_overlay,
         dado_depth=dado_depth,
         face_width=face_width,
-        part="mid_drawer_low"
+        part="mid_drawer_low",
+        hide=hide
       );
 
       // TODO this offset is obviously nonsense
@@ -156,6 +159,7 @@ module side_storage(
     top_gap=undef,
     bottom_gap=undef,
     bottom_recess=undef,
+    hide="",
     explode=false
 ){
     carcas_height = val_or_default(carcas_height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
@@ -212,7 +216,8 @@ module side_storage(
           face_overlay=face_overlay,
           dado_depth=dado_depth,
           face_width=face_width,
-          part="side_drawer"
+          part="side_drawer",
+          hide=hide
         );
 
 
@@ -266,6 +271,7 @@ module storage(
     face_panel_material=undef,
     face_overlay=undef,
     depth_gap=undef,
+    hide="",
     explode=false
 ){
 
@@ -309,6 +315,7 @@ module storage(
     face_panel_material=face_panel_material,
     face_overlay=face_overlay,
     depth_gap=depth_gap,
+    hide=hide,
     explode=explode,
     face_width=face_width
   );
@@ -336,6 +343,7 @@ module storage(
     face_panel_material=face_panel_material,
     face_overlay=face_overlay,
     depth_gap=depth_gap,
+    hide=hide,
     explode=explode
   );
 }
