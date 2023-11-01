@@ -45,12 +45,14 @@ module back_panel_set(
     panel_thickness=undef,
     panel_material=undef,
     dado_depth=undef,
-    division_width=undef,
+    divisions=undef,
     should_log=true,
-    explode=false
+    explode=0
 ){
-    division_width= val_or_default(division_width, DIVISION_WIDTH);
-    explode_offset = explode ? 75 : 0;
+    width = val_or_default(width, TOT_WIDTH);
+    divisions = val_or_default(divisions, DIVISIONS);
+    division_width = width / divisions;
+    explode_offset = explode * 75;
 
     col1 = pink;
     col2 = red;

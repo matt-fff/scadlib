@@ -11,8 +11,11 @@ module face(
     face_thickness=undef,
     face_width=undef,
     carcas_thickness=undef,
-    division_width=undef
+    divisions=undef
 ){
+  width = val_or_default(width, TOT_WIDTH);
+  divisions = val_or_default(divisions, DIVISIONS);
+  division_width = width / divisions;
   face_plate_outline(
       depth=depth,
       height=height,

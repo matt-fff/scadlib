@@ -22,7 +22,7 @@ module cabinet(
         panel_thickness=undef,
         dado_depth=undef,
         divisions=undef,
-        explode=false,
+        explode=0,
         hide=""
 ){
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
@@ -42,7 +42,7 @@ module cabinet(
     col1 = pink;
     col2 = red;
     col3 = orange;
-    explode_offset = explode ? 150 : 0;
+    explode_offset = explode * 150;
 
     if(!in("kick", hide)) {
       Z(-explode_offset)
@@ -70,6 +70,7 @@ module cabinet(
           drawer_height=drawer_height,
           panel_thickness=panel_thickness,
           dado_depth=dado_depth,
+          divisions=divisions,
           explode=explode
       );
     }
@@ -80,6 +81,7 @@ module cabinet(
           carcas_thickness=carcas_thickness,
           panel_thickness=panel_thickness,
           dado_depth=dado_depth,
+          divisions=divisions,
           explode=explode
       );
     }
@@ -96,6 +98,7 @@ module cabinet(
         dado_depth=dado_depth,
         panel_thickness=panel_thickness,
         carcas_thickness=carcas_thickness,
+        divisions=divisions,
         hide=hide,
         explode=explode
       );
@@ -123,13 +126,15 @@ module cabinet(
           width=width,
           face_thickness=face_thickness,
           face_width=face_width,
+          divisions=divisions,
           carcas_thickness=carcas_thickness
       );
     }
 }
 
 cabinet(
+  width=inch_to_mm(72),
   face_width=inch_to_mm(1.685),
-  explode=false,
-  hide="carcas");
+  explode=0,
+  hide="");
 

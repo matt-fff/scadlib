@@ -57,7 +57,7 @@ module frame_braces(
     brace_width=undef,
     panel_thickness=undef,
     col=yellow,
-    explode=false
+    explode=0
 ){
     depth = val_or_default(depth, TOT_DEPTH);
     height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
@@ -65,8 +65,8 @@ module frame_braces(
     thickness = val_or_default(thickness, CARCAS_THICKNESS);
     brace_width = val_or_default(brace_width, BRACE_WIDTH);
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
-    explode_back_offset = explode ? 125 : 0;
-    explode_top_offset = explode ? 75 : 0;
+    explode_back_offset = explode * 125;
+    explode_top_offset = explode * 75;
 
     part = "frame_braces";
     material = CARCAS_MATERIAL;

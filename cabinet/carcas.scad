@@ -13,8 +13,8 @@ module carcas(
     drawer_height=undef,
     panel_thickness=undef,
     dado_depth=undef,
-    division_width=undef,
-    explode=false
+    divisions=undef,
+    explode=0
 ){
     depth = val_or_default(depth, TOT_DEPTH);
     height = val_or_default(height, TOT_HEIGHT);
@@ -25,8 +25,9 @@ module carcas(
     drawer_height= val_or_default(drawer_height, DRAWER_HEIGHT);
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
-    division_width= val_or_default(division_width, DIVISION_WIDTH);
-    explode_offset = explode ? 100 : 0;
+    divisions = val_or_default(divisions, DIVISIONS);
+    division_width= width / divisions;
+    explode_offset = explode * 100;
 
     col1 = pink;
     col2 = red;

@@ -28,7 +28,7 @@ module middle_storage(
     bottom_gap=undef,
     bottom_recess=undef,
     hide="",
-    explode=false
+    explode=0
 ){
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
@@ -37,7 +37,7 @@ module middle_storage(
     nominal_drawer_height = val_or_default(nominal_drawer_height, DRAWER_HEIGHT);
     face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
 
-    explode_offset = explode ? opening_depth : 0;
+    explode_offset = explode * opening_depth;
 
 
     g(
@@ -160,7 +160,7 @@ module side_storage(
     bottom_gap=undef,
     bottom_recess=undef,
     hide="",
-    explode=false
+    explode=0
 ){
     carcas_height = val_or_default(carcas_height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
     face_width = val_or_default(face_width, FACE_WIDTH);
@@ -175,7 +175,7 @@ module side_storage(
     bottom_recess = val_or_default(bottom_recess, DRAWER_BOTTOM_RECESS);
 
     
-    explode_offset = explode ? opening_depth : 0;
+    explode_offset = explode * opening_depth;
     actual_drawer_height = nominal_drawer_height - face_width/2;
 
     g(
@@ -259,7 +259,7 @@ module storage(
     face_width=undef,
     face_trim_thickness=undef,
     face_trim_material=undef,
-    division_width=undef,
+    divisions=undef,
     drawer_height=undef,
     dado_depth=undef,
     panel_thickness=undef,
@@ -272,11 +272,13 @@ module storage(
     face_overlay=undef,
     depth_gap=undef,
     hide="",
-    explode=false
+    explode=0
 ){
 
   depth = val_or_default(depth, TOT_DEPTH);
-  division_width = val_or_default(division_width, DIVISION_WIDTH);
+  width = val_or_default(width, TOT_WIDTH);
+  divisions = val_or_default(divisions, DIVISIONS);
+  division_width = width / divisions;
   opening_depth = depth - panel_thickness - carcas_thickness;
 
   
