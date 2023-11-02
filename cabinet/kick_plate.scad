@@ -11,6 +11,7 @@ module kick_plate(
     width=undef,
     thickness=undef,
     kick_inset=undef,
+    divisions=undef,
     left_exposed=false,
     right_exposed=false
 ){
@@ -19,6 +20,8 @@ module kick_plate(
     width = val_or_default(width, TOT_WIDTH);
     thickness = val_or_default(thickness, CARCAS_THICKNESS);
     kick_inset = val_or_default(kick_inset, KICK_INSET);
+    divisions = val_or_default(divisions, DIVISIONS);
+    division_width = width / divisions;
 
     part = "kick_plate";
     material = CARCAS_MATERIAL;
@@ -48,12 +51,12 @@ module kick_plate(
             subpart="front_runner"
         );
         
-        // TODO technically this is wrong.
+
+        // TODO explicit miter
         // We make the sides oversized because
         // exposed corners need to be mitered
-        side_width = depth - kick_inset;
-        left_width = side_width + (left_exposed ? thickness : 0);
-        right_width = side_width + (right_exposed ? thickness : 0);
+        side_width = depth - kick_inset + thickness;
+        brace_width = depth - kick_inset - thickness;
         
         g(Y(-thickness)) {
             // Sides
@@ -61,7 +64,7 @@ module kick_plate(
             turnXY(90)
             logbox(
                 thickness,
-                x=left_width,
+                x=side_width,
                 h=height,
                 part=part,
                 material=material,
@@ -70,11 +73,25 @@ module kick_plate(
             turnXY(90)
             logbox(
                 thickness,
-                x=right_width,
+                x=side_width,
                 h=height,
                 part=part,
                 material=material,
                 subpart="right_side"
+            );
+            // Braces 
+            X(division_width)
+            pieces(divisions - 1)
+            X(span(width - division_width*2 - thickness))
+            Y(thickness)
+            turnXY(90)
+            logbox(
+                thickness,
+                x=brace_width,
+                h=height,
+                part=part,
+                material=material,
+                subpart="brace"
             );
         }
     }

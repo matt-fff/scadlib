@@ -60,8 +60,8 @@ module back_panel_set(
     Y(-explode_offset)
     g(TOUP()) {
         clear(gray)
-        pieces(3)
-        X(division_width * vRepeat(0, 1, 2))
+        pieces(divisions)
+        X(span(width - division_width))
         // Add the actual back panel
         back_panel(
             height=height,

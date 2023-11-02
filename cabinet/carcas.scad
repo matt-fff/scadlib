@@ -28,14 +28,15 @@ module carcas(
     divisions = val_or_default(divisions, DIVISIONS);
     division_width= width / divisions;
     explode_offset = explode * 100;
-
+  
+    // TODO scalable colors
     col1 = pink;
     col2 = red;
     col3 = orange;
     g(TOUP()) {
         clear(gray)
-        pieces(3)
-        X(division_width * vRepeat(0, 1, 2))
+        pieces(divisions)
+        X(span(width - division_width))
         frame_braces(
             depth=depth,
             height=height,
@@ -60,8 +61,8 @@ module carcas(
     {
         add()
         g(TOUP()) {
-            pieces(3)
-            X(division_width * vRepeat(0, 1, 2))
+            pieces(divisions)
+            X(span(width - division_width))
             assemble() {
                 add()
                 frame_outline(
