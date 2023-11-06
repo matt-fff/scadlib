@@ -19,17 +19,27 @@ module pipe(
         h=length,
         wall=wall
     );
-    
-//    threaded_rod(
-////        d=diam,
-//        l=length,
-//        pitch=2,
-//        $fa=1,
-//        $fs=1,
-//        end_len=1.5,
-//        bevel=true
-//    );
     children();
+}
+
+module coupler_trio(
+    length=COUPLER_LEN,
+    diam=COUPLER_DIAM,
+    wall=COUPLER_DIAM-PIPE_DIAM,
+) {
+  pipe(
+    length=length,
+    diam=diam,
+    wall=wall
+  );
+  X(length/2)
+  turnXZ(90)
+  pipe(
+    length=length/2,
+    diam=diam,
+    wall=wall
+  );
+  children();
 }
 
 module coupler_duo(
