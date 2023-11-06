@@ -1,4 +1,5 @@
 include <constructive/constructive-compiled.scad> 
+include <scadlib/common/pipe.scad>
 
 module log_header() {
     echo(str("dim_header: ", str(DIMENSION_HEADER)));
@@ -38,6 +39,31 @@ module logbox(
     assert(len(dimensions) == len(DIMENSION_HEADER));
     if (should_log) log_dims(dimensions);
     box(side=side, x=x, y=y, z=z, h=h);
+    children();
+}
+
+module logpipe(
+    length,
+    diam,
+    wall,
+    part="",
+    subpart="",
+    material="pipe",
+    count=1,
+    should_log=true
+) {
+    dimensions = [
+        part,
+        subpart, 
+        material, 
+        length,
+        diam,
+        wall,
+        count
+    ];
+    assert(len(dimensions) == len(DIMENSION_HEADER));
+    if (should_log) log_dims(dimensions);
+    pipe(length=length, diam=diam, wall=wall);
     children();
 }
 
