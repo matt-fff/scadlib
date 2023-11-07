@@ -25,20 +25,28 @@ module pipe(
 module coupler_trio(
     length=COUPLER_LEN,
     diam=COUPLER_DIAM,
-    wall=COUPLER_DIAM-PIPE_DIAM,
+    wall=PIPE_WALL_WIDTH,
 ) {
-  pipe(
-    length=length,
-    diam=diam,
-    wall=wall
-  );
-  X(length/2)
-  turnXZ(90)
-  pipe(
-    length=length/2,
-    diam=diam,
-    wall=wall
-  );
+  assert(length >= diam, "Error: 'length' must be greater than or equal to 'diam'"); 
+
+  g(
+){
+    pipe(
+      length=length,
+      diam=diam,
+      wall=wall
+    );
+    
+    internal_offset = 10;
+    side_len = length / 2 + internal_offset;
+    X((diam + side_len)/2 - internal_offset)
+    turnXZ(90)
+    pipe(
+      length=side_len,
+      diam=diam,
+      wall=wall
+    );
+  }
   children();
 }
 
@@ -49,16 +57,16 @@ module coupler_duo(
     angle=90
 ){
     radius = diam/2;
-    inner_radius = 0;
-    bend_radius = length/2;
+    inner_radius = (diam-wall) / 2;
+    bend_radius = length / PI;
 
     angle_1 = 0;
     angle_2 = angle;
     // bend
 
     
-    X(-diam)
-    Z(-diam)
+    X(radius)
+    Z(-radius)
     turnYZ(90)
     difference() {
       // torus
@@ -66,28 +74,37 @@ module coupler_duo(
       translate([bend_radius + radius, 0, 0])
       circle(r=radius);
 
-      // torus cutout
-      rotate_extrude()
-      translate([bend_radius + radius, 0, 0])
-      circle(r=inner_radius);
+      if (inner_radius > 0) {
+        // torus cutout
+        rotate_extrude()
+        translate([bend_radius + radius, 0, 0])
+        circle(r=inner_radius);
+      }
 
       mult = ((angle_2 - angle_1) <= 180) ? 1 : 0;
+      cut_side = max(length, diam*2) * 2;
 
       // lower cutout
       rotate([0, 0, angle_1])
       translate(
         [
-          -50 * mult,
-          -100,
-          -50
+          -cut_side/2 * mult,
+          -cut_side/2,
+          -diam
         ]
       )
-      cube([100, 100, 100]);
+      cube([cut_side, cut_side/2, diam*2]);
 
       // upper cutout
       rotate([0, 0, angle_2])
-      translate([-50 * mult, 0, -50])
-      cube([100, 100, 100]);
+      translate(
+        [
+          -cut_side/2 * mult,
+          -cut_side/2,
+          -diam
+        ]
+      )
+      cube([cut_side, cut_side/2, diam*2]);
     }
     children();
 }
