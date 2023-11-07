@@ -22,6 +22,30 @@ module pipe(
     children();
 }
 
+module coupler_quad(
+    length=COUPLER_LEN,
+    diam=COUPLER_DIAM,
+    wall=PIPE_WALL_WIDTH,
+) {
+  assert(length >= diam, "Error: 'length' must be greater than or equal to 'diam'"); 
+
+  g(){
+    pipe(
+      length=length,
+      diam=diam,
+      wall=wall
+    );
+    
+    turnXZ(90)
+    pipe(
+      length=length,
+      diam=diam,
+      wall=wall
+    );
+  }
+  children();
+}
+
 module coupler_trio(
     length=COUPLER_LEN,
     diam=COUPLER_DIAM,
