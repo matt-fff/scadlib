@@ -51,7 +51,7 @@ module back_panel_set(
 ){
     width = val_or_default(width, TOT_WIDTH);
     divisions = val_or_default(divisions, DIVISIONS);
-    division_width = width / divisions;
+    division_width = width / len(divisions);
     explode_offset = explode * 75;
 
     col1 = pink;
@@ -60,7 +60,7 @@ module back_panel_set(
     Y(-explode_offset)
     g(TOUP()) {
         clear(gray)
-        pieces(divisions)
+        pieces(len(divisions))
         X(span(width - division_width))
         // Add the actual back panel
         back_panel(

@@ -15,7 +15,7 @@ module face(
 ){
   width = val_or_default(width, TOT_WIDTH);
   divisions = val_or_default(divisions, DIVISIONS);
-  division_width = width / divisions;
+  division_width = width / len(divisions);
   face_plate_outline(
       depth=depth,
       height=height,

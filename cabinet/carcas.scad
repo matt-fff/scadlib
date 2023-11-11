@@ -26,7 +26,7 @@ module carcas(
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     divisions = val_or_default(divisions, DIVISIONS);
-    division_width= width / divisions;
+    division_width= width / len(divisions);
     explode_offset = explode * 100;
   
     // TODO scalable colors
@@ -35,7 +35,7 @@ module carcas(
     col3 = orange;
     g(TOUP()) {
         clear(gray)
-        pieces(divisions)
+        pieces(len(divisions))
         X(span(width - division_width))
         frame_braces(
             depth=depth,
@@ -53,7 +53,7 @@ module carcas(
         face_thickness=face_thickness,
         face_width=face_width,
         carcas_thickness=carcas_thickness,
-        division_width=division_width,
+        divisions=divisions,
         dado_depth=dado_depth,
         panel_thickness=panel_thickness
     );
@@ -61,7 +61,7 @@ module carcas(
     {
         add()
         g(TOUP()) {
-            pieces(divisions)
+            pieces(len(divisions))
             X(span(width - division_width))
             assemble() {
                 add()
@@ -92,7 +92,7 @@ module carcas(
             face_thickness=face_thickness,
             face_width=face_width,
             carcas_thickness=carcas_thickness,
-            division_width=division_width,
+            divisions=divisions,
             dado_depth=dado_depth,
             panel_thickness=panel_thickness,
             should_log=false

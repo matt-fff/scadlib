@@ -4,7 +4,9 @@ TOT_WIDTH = inch_to_mm(72);
 TOT_HEIGHT = inch_to_mm(39);
 TOT_DEPTH = inch_to_mm(18.5);
 
-DIVISIONS = 3;
+DIVISIONS = [
+  [], [], []
+];
 DIVISION_WIDTH = TOT_WIDTH / DIVISIONS;
 
 TOP_THICKNESS = inch_to_mm(0.75);

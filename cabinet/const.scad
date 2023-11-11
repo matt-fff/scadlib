@@ -1,0 +1,3 @@
+DRAWER = 1;
+DOOR = 2;
+DOUBLE_DOOR = 3;

@@ -21,7 +21,7 @@ module kick_plate(
     thickness = val_or_default(thickness, CARCAS_THICKNESS);
     kick_inset = val_or_default(kick_inset, KICK_INSET);
     divisions = val_or_default(divisions, DIVISIONS);
-    division_width = width / divisions;
+    division_width = width / len(divisions);
 
     part = "kick_plate";
     material = CARCAS_MATERIAL;
@@ -81,7 +81,7 @@ module kick_plate(
             );
             // Braces 
             X(division_width)
-            pieces(divisions - 1)
+            pieces(len(divisions) - 1)
             X(span(width - division_width*2 - thickness))
             Y(thickness)
             turnXY(90)

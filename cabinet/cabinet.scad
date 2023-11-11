@@ -10,6 +10,10 @@ include <scadlib/cabinet/kick_plate.scad>
 include <scadlib/cabinet/top.scad>
 include <scadlib/cabinet/back_panel.scad>
 
+DRAWER = 1;
+DOOR = 2;
+DOUBLE_DOOR = 3;
+
 module cabinet(
         depth=undef,
         height=undef,
@@ -38,7 +42,7 @@ module cabinet(
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     divisions = val_or_default(divisions, DIVISIONS);
-    division_width = width / divisions;
+    division_width = width / len(divisions);
 
     col1 = pink;
     col2 = red;

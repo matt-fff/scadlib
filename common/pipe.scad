@@ -78,11 +78,11 @@ module coupler_duo(
     length=COUPLER_LEN,
     diam=COUPLER_DIAM,
     wall=COUPLER_DIAM-PIPE_DIAM,
+    bend_radius=2,
     angle=90
 ){
     radius = diam/2;
     inner_radius = (diam-wall) / 2;
-    bend_radius = length / PI;
 
     angle_1 = 0;
     angle_2 = angle;

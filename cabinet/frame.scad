@@ -123,7 +123,7 @@ module frame_storage(
     face_width=undef,
     face_thickness=undef,
     carcas_thickness=undef,
-    division_width=undef,
+    divisions=undef,
     drawer_height=undef,
     dado_depth=undef,
     panel_thickness=undef,
@@ -135,10 +135,12 @@ module frame_storage(
     face_width = val_or_default(face_width, FACE_WIDTH);
     face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
-    division_width = val_or_default(division_width, TOT_WIDTH / 3);
     drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+
+    divisions = val_or_default(divisions, DIVISIONS);
+    division_width = width / len(divisions);
 
     part = "frame_storage";
     material = CARCAS_MATERIAL;
