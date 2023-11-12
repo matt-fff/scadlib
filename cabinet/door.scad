@@ -18,7 +18,8 @@ module door(
     face_overlay=undef,
     face_width=undef,
     dado_depth=undef,
-    part="door"
+    part="door",
+    explode=0
 ) {
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
     face_trim_thickness = val_or_default(face_trim_thickness, FACE_THICKNESS);

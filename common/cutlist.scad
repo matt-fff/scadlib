@@ -2,11 +2,11 @@ include <constructive/constructive-compiled.scad>
 include <scadlib/common/pipe.scad>
 
 module log_header() {
-    echo(str("dim_header: ", str(DIMENSION_HEADER)));
+    //echo(str("dim_header: ", str(DIMENSION_HEADER)));
 }
 
 module log_dims(dimensions) {
-    echo(str("dimensions: ", str(dimensions)));
+    //echo(str("dimensions: ", str(dimensions)));
 }
 
 module logbox(

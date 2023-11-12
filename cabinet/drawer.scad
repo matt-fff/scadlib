@@ -73,7 +73,8 @@ module drawer(
     face_width=undef,
     dado_depth=undef,
     part="drawer",
-    hide=""
+    hide="",
+    explode=0
 ) {
     depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
     top_gap = val_or_default(top_gap, DRAWER_TOP_GAP);

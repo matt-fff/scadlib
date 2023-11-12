@@ -12,7 +12,6 @@ module storage_subdivision(
     opening_height,
     face_trim_thickness=undef,
     face_trim_material=undef,
-    nominal_drawer_height=undef,
     dado_depth=undef,
     panel_thickness=undef,
     panel_material=undef,
@@ -35,10 +34,8 @@ module storage_subdivision(
   carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
   depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
   bottom_gap = val_or_default(bottom_gap, DRAWER_BOTTOM_GAP);
-  nominal_drawer_height = val_or_default(nominal_drawer_height, DRAWER_HEIGHT);
   face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
 
-  explode_offset = explode * opening_depth;
 
 
   if(DRAWER == storage_type){
@@ -62,25 +59,24 @@ module storage_subdivision(
         dado_depth=dado_depth,
         face_width=face_width,
         hide=hide,
-        part="drawer"
+        part="drawer",
+        explode=explode
       );
   }
   if(DOOR == storage_type){
       // TODO this offset is obviously nonsense
       door_z_offset = 227;
 
-      door_width = opening_width - face_overlay;
       door_height = (
-        carcas_height 
-        - nominal_drawer_height 
+        opening_height
         - face_width 
-        - carcas_thickness
       );
-      Z(door_z_offset)
+      //Z(door_z_offset)
+      //Z(door_height/2)
       door(
         opening_depth,
-        door_width,
-        door_height,
+        opening_width,
+        opening_height,
         carcas_thickness=carcas_thickness,
         face_trim_thickness=face_trim_thickness,
         face_trim_material=face_trim_material,
@@ -89,27 +85,23 @@ module storage_subdivision(
         face_overlay=face_overlay,
         dado_depth=dado_depth,
         face_width=face_width,
-        part="door"
+        part="door",
+        explode=explode
       );
   }
   if(DOUBLE_DOOR == storage_type){
       // TODO this offset is obviously nonsense
-      door_z_offset = carcas_height - nominal_drawer_height*2 + 119;
-      door_height = (
-        carcas_height 
-        - nominal_drawer_height*2
-        - face_width 
-        - carcas_thickness
-      );
+      door_z_offset = opening_height + 119;
       door_width = opening_width/2 - face_overlay;
 
-      Z(door_z_offset)
+      //Z(door_z_offset)
+      //Z(door_height/2)
       pieces(2)
       X(vRepeat(0, opening_width/2 + face_overlay))
       door(
         opening_depth,
         door_width,
-        door_height,
+        opening_height,
         carcas_thickness=carcas_thickness,
         face_trim_thickness=face_trim_thickness,
         face_trim_material=face_trim_material,
@@ -118,7 +110,8 @@ module storage_subdivision(
         face_overlay=face_overlay,
         dado_depth=dado_depth,
         face_width=face_width,
-        part="double-door"
+        part="double-door",
+        explode=explode
       );
   }
 }
@@ -157,6 +150,14 @@ module storage_division(
     face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
 
     explode_offset = explode * opening_depth;
+    types = [for (d = division) d[0]];
+    heights = [for (d = division) carcas_height*d[1]];
+    cumulative_heights = [ for (
+      a=0, b=0;
+      a < len(heights);
+      a= a+1, b=b+heights[a-1])
+        b
+    ];
 
     g(
         Y(
@@ -172,29 +173,38 @@ module storage_division(
         TOREAR()
     ){
       pieces(len(division))
-      Z((carcas_height * division[every(1)][1])/2)
-      storage_subdivision(
-        division[every(1)][0],
-        opening_depth,
-        opening_width,
-        carcas_height * division[every(1)][1],
-        carcas_height=carcas_height,
-        face_width=face_width,
-        face_trim_thickness=face_trim_thickness,
-        face_trim_material=face_trim_material,
-        dado_depth=dado_depth,
-        panel_thickness=panel_thickness,
-        panel_material=panel_material,
-        carcas_thickness=carcas_thickness,
-        carcas_material=carcas_material,
-        bottom_material=bottom_material,
-        face_panel_thickness=face_panel_thickness,
-        face_panel_material=face_panel_material,
-        face_overlay=face_overlay,
-        depth_gap=depth_gap,
-        hide=hide,
-        explode=explode
-      );
+      g(){
+        index = every(1);
+        nominal_height = heights[index];
+        opening_height = nominal_height - 2*face_trim_thickness;
+        height_offset = cumulative_heights[index];
+
+        //echo(str("index, height, height_offset: ", str([index, height, height_offset])));
+
+        Z(height_offset)
+        storage_subdivision(
+          types[index],
+          opening_depth,
+          opening_width,
+          opening_height,
+          carcas_height=carcas_height,
+          face_width=face_width,
+          face_trim_thickness=face_trim_thickness,
+          face_trim_material=face_trim_material,
+          dado_depth=dado_depth,
+          panel_thickness=panel_thickness,
+          panel_material=panel_material,
+          carcas_thickness=carcas_thickness,
+          carcas_material=carcas_material,
+          bottom_material=bottom_material,
+          face_panel_thickness=face_panel_thickness,
+          face_panel_material=face_panel_material,
+          face_overlay=face_overlay,
+          depth_gap=depth_gap,
+          hide=hide,
+          explode=explode
+        );
+      }
     }
     children();
 }
