@@ -64,15 +64,6 @@ module storage_subdivision(
       );
   }
   if(DOOR == storage_type){
-      // TODO this offset is obviously nonsense
-      door_z_offset = 227;
-
-      door_height = (
-        opening_height
-        - face_width 
-      );
-      //Z(door_z_offset)
-      //Z(door_height/2)
       door(
         opening_depth,
         opening_width,
@@ -90,12 +81,8 @@ module storage_subdivision(
       );
   }
   if(DOUBLE_DOOR == storage_type){
-      // TODO this offset is obviously nonsense
-      door_z_offset = opening_height + 119;
       door_width = opening_width/2 - face_overlay;
 
-      //Z(door_z_offset)
-      //Z(door_height/2)
       pieces(2)
       X(vRepeat(0, opening_width/2 + face_overlay))
       door(

@@ -260,6 +260,7 @@ module shaker_face(
   panel_material=undef,
   part="face"
 ){
+    Z(opening_height/2)
     assemble() {
 
       // Technically this isn't the right size,

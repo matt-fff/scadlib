@@ -88,7 +88,6 @@ module cabinet(
       );
     }
     if(!in("storage", hide)) {
-      Z(kick_height)
       clear(gold)
       storage(
         depth=depth,

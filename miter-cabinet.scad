@@ -19,22 +19,22 @@ cabinet(
       [DOUBLE_DOOR, 0.50],
     ],
     
-    //[
-    //  [DOOR, 0.333],
-    //  [DOOR, 0.333],
-    //  [DOOR, 0.333],
-    //],
+    [
+      [DOOR, 0.333],
+      [DOOR, 0.333],
+      [DOOR, 0.333],
+    ],
 
 
-    //[[DRAWER, 0.25],
-    //  [DOOR, 0.75]],
+    [[DRAWER, 0.25],
+      [DOOR, 0.75]],
 
-    //[[DOUBLE_DOOR, 0.50],
-    //  [DRAWER, 0.25],
-    //  [DRAWER, 0.25]],
+    [[DOUBLE_DOOR, 0.50],
+      [DRAWER, 0.25],
+      [DRAWER, 0.25]],
 
-    //[[DRAWER, 0.25],
-    //  [DOOR, 0.75]]
+    [[DRAWER, 0.25],
+      [DOOR, 0.75]]
   ],
   hide=""
 );
