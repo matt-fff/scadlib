@@ -1,5 +1,6 @@
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
+include <scadlib/cabinet/utils.scad>
 include <scadlib/cabinet/frame.scad>
 include <scadlib/cabinet/back_panel.scad>
 
@@ -26,8 +27,13 @@ module carcas(
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     divisions = val_or_default(divisions, DIVISIONS);
-    division_width= width / len(divisions);
     explode_offset = explode * 100;
+
+    division_widths = division_carcas_widths(
+      width, face_width, carcas_thickness, divisions
+    );
+
+    cumulative_widths = accumulate(division_widths);
   
     // TODO scalable colors
     col1 = pink;
@@ -36,11 +42,11 @@ module carcas(
     g(TOUP()) {
         clear(gray)
         pieces(len(divisions))
-        X(spanAllButLast(width))
+        X(cumulative_widths[every(1)])
         frame_braces(
             depth=depth,
             height=height,
-            width=division_width,
+            width=division_widths[every(1)],
             col=vRepeat(col1, col2, col3),
             explode=explode
         );
@@ -59,23 +65,23 @@ module carcas(
     );
     assemble()
     {
+        pieces(len(divisions))
+        X(cumulative_widths[every(1)])
         add()
         g(TOUP()) {
-            pieces(len(divisions))
-            X(spanAllButLast(width))
             assemble() {
                 add()
                 frame_outline(
                     depth=depth,
                     height=height,
-                    width=division_width,
+                    width=division_widths[every(1)],
                     col=vRepeat(col1, col2, col3)
                 );
                 // Hollow out a channel for the panel
                 remove()
                 back_panel(
                     height=height, // intentionally large
-                    width=division_width,
+                    width=division_widths[every(1)],
                     carcas_thickness=carcas_thickness,
                     panel_thickness=panel_thickness,
                     dado_depth=dado_depth,

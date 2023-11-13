@@ -45,6 +45,9 @@ module cabinet(
     col3 = orange;
     explode_offset = explode * 150;
 
+    // OVERLAY COMPONENTS
+    // These are parts that have to have context 
+    // on the overall cabinet layout
     if(!in("kick", hide)) {
       Z(-explode_offset)
       TODOWN()
@@ -55,7 +58,37 @@ module cabinet(
           divisions=divisions
       );
     }
+    if(!in("top", hide)) {
+      Z(explode_offset)
+      clear()
+      Z(
+          height -
+          kick_height -
+          top_thickness/2
+      )
+      top(
+          depth=depth,
+          width=width,
+          thickness=top_thickness
+      );
+    }
+    if(!in("face", hide)) {
+      Y(explode_offset)
+      clear(beige)
+      face(
+          depth=depth,
+          height=height - kick_height - top_thickness,
+          width=width,
+          face_thickness=face_thickness,
+          face_width=face_width,
+          divisions=divisions,
+          carcas_thickness=carcas_thickness
+      );
+    }
 
+    // MODULAR COMPONENTS
+    // These are parts that only need
+    // to know their own dimensions
     if(!in("carcas", hide)) {
       clear()
       carcas(
@@ -98,33 +131,6 @@ module cabinet(
         divisions=divisions,
         hide=hide,
         explode=explode
-      );
-    }
-    if(!in("top", hide)) {
-      Z(explode_offset)
-      clear()
-      Z(
-          height -
-          kick_height -
-          top_thickness/2
-      )
-      top(
-          depth=depth,
-          width=width,
-          thickness=top_thickness
-      );
-    }
-    if(!in("face", hide)) {
-      Y(explode_offset)
-      clear(beige)
-      face(
-          depth=depth,
-          height=height - kick_height - top_thickness,
-          width=width,
-          face_thickness=face_thickness,
-          face_width=face_width,
-          divisions=divisions,
-          carcas_thickness=carcas_thickness
       );
     }
 }

@@ -139,13 +139,7 @@ module storage_division(
     explode_offset = explode * opening_depth;
     types = [for (d = division) d[0]];
     heights = [for (d = division) carcas_height*d[1]];
-    cumulative_heights = [ for (
-      a=0, b=0;
-      a < len(heights);
-      a= a+1, b=b+heights[a-1])
-        b
-    ];
-
+    cumulative_heights = accumulate(heights);
     g(
         Y(
             carcas_thickness

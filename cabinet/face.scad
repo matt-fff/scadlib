@@ -149,13 +149,7 @@ module face_plate_storage(
     division = divisions[every(1)];
 
     heights = [for (d = division) height*d[1]];
-    cumulative_heights = [ for (
-      a=0, b=0;
-      a < len(heights);
-      a= a+1, b=b+heights[a-1])
-        b
-    ];
-  
+    cumulative_heights = accumulate(heights);
     rail_offset = max(carcas_thickness, face_width/2);
     rail_width = division_width - rail_offset*2;
 
