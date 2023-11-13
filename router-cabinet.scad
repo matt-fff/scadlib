@@ -1,4 +1,5 @@
 include <scadlib/cabinet/cabinet.scad>
+include <scadlib/cabinet/const.scad>
 
 cabinet(
   width=inch_to_mm(72),
@@ -15,5 +16,6 @@ cabinet(
       [DRAWER, 0.25]],
   ],
   explode=0,
-  hide="");
+  hide=""
+);
 

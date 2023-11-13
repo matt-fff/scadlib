@@ -36,7 +36,7 @@ module carcas(
     g(TOUP()) {
         clear(gray)
         pieces(len(divisions))
-        X(span(width - division_width))
+        X(spanAllButLast(width))
         frame_braces(
             depth=depth,
             height=height,
@@ -62,7 +62,7 @@ module carcas(
         add()
         g(TOUP()) {
             pieces(len(divisions))
-            X(span(width - division_width))
+            X(spanAllButLast(width))
             assemble() {
                 add()
                 frame_outline(

@@ -166,8 +166,6 @@ module storage_division(
         opening_height = nominal_height - 2*face_trim_thickness;
         height_offset = cumulative_heights[index];
 
-        //echo(str("index, height, height_offset: ", str([index, height, height_offset])));
-
         Z(height_offset)
         storage_subdivision(
           types[index],

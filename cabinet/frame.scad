@@ -11,16 +11,17 @@ module frame_outline(
     width=undef,
     thickness=undef,
     brace_width=undef,
-    col=yellow
+    col=yellow,
+    material=undef
 ){
     depth = val_or_default(depth, TOT_DEPTH);
     height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
     width = val_or_default(width, TOT_WIDTH);
     thickness = val_or_default(thickness, CARCAS_THICKNESS);
     brace_width = val_or_default(brace_width, BRACE_WIDTH);
+    material = val_or_default(material, CARCAS_MATERIAL);
 
     part = "frame_outline";
-    material = CARCAS_MATERIAL;
     clear(col)
     TORIGHT()
     g(TOREAR()) {

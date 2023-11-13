@@ -10,10 +10,6 @@ include <scadlib/cabinet/kick_plate.scad>
 include <scadlib/cabinet/top.scad>
 include <scadlib/cabinet/back_panel.scad>
 
-DRAWER = 1;
-DOOR = 2;
-DOUBLE_DOOR = 3;
-
 module cabinet(
         depth=undef,
         height=undef,
