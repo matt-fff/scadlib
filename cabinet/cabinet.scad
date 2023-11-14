@@ -56,6 +56,9 @@ module cabinet(
     int_parts = [
       "frame-shelves"
     ];
+
+
+    validate_divisions(divisions);
    
 
     // OVERLAY COMPONENTS
@@ -122,6 +125,7 @@ module cabinet(
         
         g(X(cumu_width)) {
           add("braces")
+          TOUP()
           frame_braces(
               depth=depth,
               height=modular_height,

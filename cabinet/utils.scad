@@ -1,4 +1,5 @@
 include <scadlib/common/utils.scad>
+include <scadlib/cabinet/const.scad>
  
 function division_carcas_widths(
   tot_width,
@@ -25,3 +26,23 @@ function division_carcas_widths(
 );
 
 function fmt_parts(parts, hidden) = join(remove_intersection(parts, hidden), ",");
+
+module validate_division(division) {
+  for (div = division) {
+    assert(len(div) == 2);
+    assert(in(div[0], [DOOR, DOUBLE_DOOR, DRAWER]));
+    assert(div[1] <= 1);
+    assert(div[1] > 0);
+  }
+
+  proportions = [for (div = division) div[1]];
+  total_prop = sum(proportions);
+  assert(total_prop > 0.999);
+  assert(total_prop < 1.001);
+}
+
+module validate_divisions(divisions) {
+    for (division = divisions) {
+      validate_division(division);
+    }
+}

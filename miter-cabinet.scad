@@ -1,6 +1,10 @@
 include <scadlib/cabinet/cabinet.scad>
 include <scadlib/cabinet/const.scad>
 
+
+miter_depth = inch_to_mm(27.75);
+
+
 cabinet(
   depth=inch_to_mm(12.75),
   width=inch_to_mm(157),
@@ -8,9 +12,10 @@ cabinet(
   explode=0,
   divisions=[
     [
-      [DRAWER, 0.50],
-      [DRAWER, 0.25],
-      [DRAWER, 0.25]
+      [DRAWER, 0.40],
+      [DRAWER, 0.20],
+      [DRAWER, 0.20],
+      [DRAWER, 0.20],
     ],
 
     [
@@ -42,7 +47,7 @@ cabinet(
       [DRAWER, 0.25]
     ]
   ],
-  explode=1,
+  explode=0,
   hide=[]
 );
 
