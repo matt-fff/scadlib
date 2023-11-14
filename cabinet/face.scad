@@ -57,7 +57,6 @@ module face_plate_outline(
     face_material = val_or_default(face_material, FACE_MATERIAL);
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
     divisions = val_or_default(divisions, DIVISIONS);
-    division_width = width / len(divisions);
 
     material = face_material;
     part = "face_plate_outline";
@@ -80,7 +79,12 @@ module face_plate_outline(
         
         // Top and bottom
         pieces(2)
-        Z(span(height - carcas_thickness))
+        Z(
+          span(
+            height - 
+            min(carcas_thickness, face_width)
+          )
+        )
         logbox(
             face_thickness,
             x=rail_width,
@@ -99,7 +103,7 @@ module face_plate_outline(
           
           pieces(len(divisions) + 1)
           X( 
-            span(width - max(face_width, carcas_thickness))
+            span(width - face_width)
           )
           logbox(
               face_thickness,
@@ -107,7 +111,7 @@ module face_plate_outline(
               h=stile_height,
               part=part,
               material=material,
-              subpart=vRepeat("right_divider", "left_divider")
+              subpart="vert-divider"
           );
         }
     }
@@ -123,7 +127,7 @@ module face_plate_storage(
     face_thickness=undef,
     face_material=undef,
     carcas_thickness=undef,
-    divisions=undef,
+    divisions=undef
 ){
   depth = val_or_default(depth, TOT_DEPTH);
   height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
@@ -133,14 +137,18 @@ module face_plate_storage(
   face_material = val_or_default(face_material, FACE_MATERIAL);
   carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
   divisions = val_or_default(divisions, DIVISIONS);
-  division_width = width / len(divisions);
 
 
   material = face_material;
   part = "face_plate_storage";
 
+  rail_width = (
+    width - (
+      max(2, len(divisions) + 1) * face_width
+    )
+  ) / len(divisions);
   
-  X(carcas_thickness)
+  X(face_width)
   pieces(len(divisions))
   X( 
     spanAllButLast(width - face_width)
@@ -150,14 +158,11 @@ module face_plate_storage(
 
     heights = [for (d = division) height*d[1]];
     cumulative_heights = accumulate(heights);
-    rail_offset = max(carcas_thickness, face_width/2);
-    rail_width = division_width - rail_offset*2;
 
     g(
         Z(
-            carcas_thickness/2
+            face_width/2
         ),
-        X(rail_offset),
         TOREAR()
     ){
       pieces(len(division))

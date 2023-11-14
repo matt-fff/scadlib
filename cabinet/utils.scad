@@ -1,3 +1,5 @@
+include <scadlib/common/utils.scad>
+ 
 function division_carcas_widths(
   tot_width,
   face_width,
@@ -21,3 +23,5 @@ function division_carcas_widths(
   ]
   )
 );
+
+function fmt_parts(parts, hidden) = join(remove_intersection(parts, hidden), ",");

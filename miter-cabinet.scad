@@ -38,10 +38,11 @@ cabinet(
     ],
 
     [
-      [DRAWER, 0.25],
-      [DOOR, 0.75]
+      [DOOR, 0.75],
+      [DRAWER, 0.25]
     ]
   ],
-  hide="storage"
+  explode=1,
+  hide=[]
 );
 

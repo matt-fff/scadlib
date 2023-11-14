@@ -31,8 +31,8 @@ module face_rail(
 
 
   Y(-tenon_void_thickness)
-  assemble(){
-    add()
+  assemble("shaker-rail"){
+    add("shaker-rail")
     logbox(
       thickness,
       x=width_with_tenon,
@@ -86,8 +86,8 @@ module face_stile(
   
   tenon_void_thickness = thickness - tenon_thickness*2;
   Y(-tenon_void_thickness)
-  assemble(){
-    add()
+  assemble("shaker-stile"){
+    add("shaker-stile")
     logbox(
       thickness,
       x=width,
@@ -141,40 +141,40 @@ module face_panel(
   overlay_offset = (trim_width - tenon_depth);
   width = opening_width - overlay_offset;
   height = opening_height - overlay_offset;
+
+
   Y(-tenon_void_thickness)
   X(opening_width/2)
-  assemble(){
-    add()
-    logbox(
-      thickness,
-      x=width,
-      h=height,
-      part=part,
-      subpart="panel",
-      material=material,
-      should_log=should_log
-    );
+  add("shaker-panel")
+  logbox(
+    thickness,
+    x=width,
+    h=height,
+    part=part,
+    subpart="panel",
+    material=material,
+    should_log=should_log
+  );
 
-    remove()
-    Z(-(height - tenon_depth)/2)
-    pieces(2) 
-    Z(span(height - tenon_depth))
-    box(
-      tenon_void_thickness,
-      x=width,
-      h=tenon_depth * FLOAT_COEFF
-    );
-    
-    remove()
-    X(-(width - tenon_depth)/2)
-    pieces(2) 
-    X(span(width - tenon_depth))
-    box(
-      tenon_void_thickness,
-      x=tenon_depth * FLOAT_COEFF,
-      h=height
-    );
-  }
+  remove()
+  Z(-(height - tenon_depth)/2)
+  pieces(2) 
+  Z(span(height - tenon_depth))
+  box(
+    tenon_void_thickness,
+    x=width,
+    h=tenon_depth * FLOAT_COEFF
+  );
+  
+  remove()
+  X(-(width - tenon_depth)/2)
+  pieces(2) 
+  X(span(width - tenon_depth))
+  box(
+    tenon_void_thickness,
+    x=tenon_depth * FLOAT_COEFF,
+    h=height
+  );
   children();
 }
 
@@ -209,12 +209,11 @@ module face_trim(
   vert_offset = (face_height - trim_width)/2;
 
   // Rails
-  add()
+  add("shaker-rail")
   X((opening_width/2))
   g(Z(-vert_offset)){
     pieces(2)
     Z(span(face_height - trim_width))
-    add()
     face_rail(
       width=face_width - trim_width*2,
       height=trim_width,
@@ -229,7 +228,7 @@ module face_trim(
   }
 
   // Stiles
-  add()
+  add("shaker-stile")
   X(horiz_offset)
   pieces(2)
   X(span(face_width - trim_width))
@@ -258,15 +257,24 @@ module shaker_face(
   tenon_depth=undef,
   panel_thickness=undef,
   panel_material=undef,
-  part="face"
+  part="face",
+  hide=[]
 ){
+    parts = [
+      "shaker-panel",
+      "shaker-trim",
+      "shaker-stile",
+      "shaker-rail"
+    ];
+
     Z(opening_height/2)
-    assemble() {
+    assemble(
+      fmt_parts(parts, hide)
+    )autoColor() {
 
       // Technically this isn't the right size,
       // but we're just going to use the face trim
       // to carve it down to the right size.
-      add()
       face_panel(
         opening_width,
         opening_height,
@@ -278,7 +286,6 @@ module shaker_face(
         part=part
       );
 
-      add()
       face_trim(
         opening_width,
         opening_height,

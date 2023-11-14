@@ -16,6 +16,6 @@ cabinet(
       [DRAWER, 0.25]],
   ],
   explode=0,
-  hide=""
+  hide=[]
 );
 

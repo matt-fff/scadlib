@@ -73,8 +73,8 @@ module drawer(
     face_width=undef,
     dado_depth=undef,
     part="drawer",
-    hide="",
-    explode=0
+    explode=0,
+    hide=[]
 ) {
     depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
     top_gap = val_or_default(top_gap, DRAWER_TOP_GAP);
@@ -100,17 +100,29 @@ module drawer(
     shell_width = opening_width - relative_width_gap;
     shell_depth = opening_depth - depth_gap;
 
+    ext_parts = [
+      "drawer-face"
+    ];
+    int_parts = [
+      "drawer-rear",
+      "drawer-bottom",
+      "drawer-front",
+      "drawer-side",
+    ];
+
     X(
       // TODO Might be bullshit
       shell_thickness/2
     ) 
-    assemble() { 
-      if(!in("carcas", hide)) {
+    assemble(
+      fmt_parts(ext_parts, hide),
+      fmt_parts(int_parts, hide)
+    ) autoColor() { 
         g(
           Z(opening_height/2)
         ){
           // Rear
-          add()
+          add("drawer-rear")
           Z(bottom_thickness)
           X(center_offset)
           logbox(
@@ -131,7 +143,7 @@ module drawer(
             + bottom_recess
           )
           X(center_offset)
-          add()
+          add("drawer-bottom")
           drawer_bottom(
             depth=shell_depth,
             width=shell_width,
@@ -155,7 +167,7 @@ module drawer(
           );
         
           // Interior front
-          add()
+          add("drawer-front")
           Y(shell_depth - shell_thickness)
           X(center_offset)
           logbox(
@@ -168,7 +180,7 @@ module drawer(
           );
 
           // Sides
-          add()
+          add("drawer-side")
           pieces(2)
           X(relative_width_gap/2)
           X(span(
@@ -183,26 +195,23 @@ module drawer(
               material=shell_material,
               subpart="side"
           );
-        }
       }
 
       // Face
-      if(!in("face", hide)) {
-        add()
-        Y(opening_depth)
-        X(-face_trim_thickness/2)
-        shaker_face(
-          opening_width=opening_width,
-          opening_height=opening_height,
-          trim_thickness=face_trim_thickness,
-          trim_width=face_width,
-          trim_material=face_trim_material,
-          trim_overlay=face_overlay,
-          panel_thickness=face_panel_thickness,
-          panel_material=face_panel_material,
-          part=part
-        );
-      }
+      add("drawer-face")
+      Y(opening_depth)
+      X(-face_trim_thickness/2)
+      shaker_face(
+        opening_width=opening_width,
+        opening_height=opening_height,
+        trim_thickness=face_trim_thickness,
+        trim_width=face_width,
+        trim_material=face_trim_material,
+        trim_overlay=face_overlay,
+        panel_thickness=face_panel_thickness,
+        panel_material=face_panel_material,
+        part=part
+      );
     }
     children();
 }

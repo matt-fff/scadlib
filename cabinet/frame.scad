@@ -2,27 +2,25 @@ include <constructive/constructive-compiled.scad>
 include <scadlib/common/cutlist.scad>
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
+include <scadlib/cabinet/const.scad>
 
 BRACE_WIDTH = inch_to_mm(3.125);
 
 module frame_outline(
+    width,
     depth=undef,
     height=undef,
-    width=undef,
     thickness=undef,
     brace_width=undef,
-    col=yellow,
     material=undef
 ){
     depth = val_or_default(depth, TOT_DEPTH);
     height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
-    width = val_or_default(width, TOT_WIDTH);
     thickness = val_or_default(thickness, CARCAS_THICKNESS);
     brace_width = val_or_default(brace_width, BRACE_WIDTH);
     material = val_or_default(material, CARCAS_MATERIAL);
 
     part = "frame_outline";
-    clear(col)
     TORIGHT()
     g(TOREAR()) {
         // Bottom
@@ -51,18 +49,16 @@ module frame_outline(
 }
 
 module frame_braces(
+    width,
     depth=undef,
     height=undef,
-    width=undef,
     thickness=undef,
     brace_width=undef,
     panel_thickness=undef,
-    col=yellow,
     explode=0
 ){
     depth = val_or_default(depth, TOT_DEPTH);
     height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
-    width = val_or_default(width, TOT_WIDTH);
     thickness = val_or_default(thickness, CARCAS_THICKNESS);
     brace_width = val_or_default(brace_width, BRACE_WIDTH);
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
@@ -71,7 +67,6 @@ module frame_braces(
 
     part = "frame_braces";
     material = CARCAS_MATERIAL;
-    opaq(col)
     g(){
         Y(-explode_back_offset)
         // Back Braces
@@ -118,30 +113,23 @@ module frame_braces(
 }
 
 module frame_storage(
+    width,
+    division,
     depth=undef,
     height=undef,
-    width=undef,
-    face_width=undef,
     face_thickness=undef,
     carcas_thickness=undef,
-    divisions=undef,
-    drawer_height=undef,
     dado_depth=undef,
     panel_thickness=undef,
     should_log=true,
 ){
     depth = val_or_default(depth, TOT_DEPTH);
     height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
-    width = val_or_default(width, TOT_WIDTH);
-    face_width = val_or_default(face_width, FACE_WIDTH);
     face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
-    drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
 
-    divisions = val_or_default(divisions, DIVISIONS);
-    division_width = width / len(divisions);
 
     part = "frame_storage";
     material = CARCAS_MATERIAL;
@@ -154,67 +142,47 @@ module frame_storage(
     );
     
     divider_width = (
-        division_width +
+        width +
         (dado_depth - carcas_thickness)*2
     );
     
-    
-    TORIGHT()
+
+    heights = [for (d = division) height*d[1]];
+    cumulative_heights = accumulate(heights);
+
     g(
         TOREAR(),
         Y(
             panel_thickness + 
             carcas_thickness
-        )
+        ),
+        Z(carcas_thickness/2),
+        X(width/2)
     ){
-        //
-        // SIDE HORIZONTAL DIVIDERS
-        //
-        
-        Z(-(face_width-carcas_thickness)/2)
-        Z(
-            height - 
-            drawer_height
-        )
-        X(carcas_thickness - dado_depth)
-        // Right Horizontal Divider
-        logbox(
-            divider_depth,
-            x=divider_width,
-            h=carcas_thickness,
-            part=part,
-            material=material,
-            subpart="right_divider",
-            should_log=should_log
-        )
-        // Left Horizontal Divider
-        X(division_width*2)
-        logbox(
-            divider_depth,
-            x=divider_width,
-            h=carcas_thickness,
-            part=part,
-            material=material,
-            subpart="left_divider",
-            should_log=should_log
+      pieces(len(division))
+      g(){
+        index = every(1);
+        height_offset = cumulative_heights[index];
+        type = division[index][0];
+
+        // We only need dividers for door boundaries
+        needs_divider = index != 0 && (
+          type == DOOR || type == DOUBLE_DOOR || type != division[index-1][0]
         );
-        
-        //
-        // CENTER HORIZONTAL DIVIDERS
-        //
-        
-        Z((face_width-carcas_thickness)/2)
-        X(division_width + face_width/2 - dado_depth)
-        Z(drawer_height*2)
-        logbox(
-            divider_depth,
-            x=divider_width,
-            h=carcas_thickness,
-            part=part,
-            material=material,
-            subpart="center_divider",
-            should_log=should_log
-        );
+
+        if (needs_divider)
+          Z(height_offset)
+          logbox(
+              divider_depth,
+              x=divider_width,
+              h=carcas_thickness,
+              part=part,
+              material=material,
+              subpart="horiz-divider",
+              should_log=should_log
+          );
+      }
     }
+
     children();
 }

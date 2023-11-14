@@ -27,7 +27,6 @@ module storage_subdivision(
     top_gap=undef,
     bottom_gap=undef,
     bottom_recess=undef,
-    hide="",
     explode=0
 ){
   panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
@@ -35,7 +34,6 @@ module storage_subdivision(
   depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
   bottom_gap = val_or_default(bottom_gap, DRAWER_BOTTOM_GAP);
   face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
-
 
 
   if(DRAWER == storage_type){
@@ -58,7 +56,6 @@ module storage_subdivision(
         face_overlay=face_overlay,
         dado_depth=dado_depth,
         face_width=face_width,
-        hide=hide,
         part="drawer",
         explode=explode
       );
@@ -125,7 +122,6 @@ module storage_division(
     top_gap=undef,
     bottom_gap=undef,
     bottom_recess=undef,
-    hide="",
     explode=0
 ){
 
@@ -180,7 +176,6 @@ module storage_division(
           face_panel_material=face_panel_material,
           face_overlay=face_overlay,
           depth_gap=depth_gap,
-          hide=hide,
           explode=explode
         );
       }
@@ -188,13 +183,13 @@ module storage_division(
     children();
 }
 module storage(
+    width,
+    division,
     depth=undef,
     height=undef,
-    width=undef,
     face_width=undef,
     face_trim_thickness=undef,
     face_trim_material=undef,
-    divisions=undef,
     drawer_height=undef,
     dado_depth=undef,
     panel_thickness=undef,
@@ -206,33 +201,18 @@ module storage(
     face_panel_material=undef,
     face_overlay=undef,
     depth_gap=undef,
-    hide="",
     explode=0
 ){
 
   depth = val_or_default(depth, TOT_DEPTH);
-  width = val_or_default(width, TOT_WIDTH);
   face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
-  divisions = val_or_default(divisions, DIVISIONS);
-  division_width = width / len(divisions);
   opening_depth = depth - panel_thickness - carcas_thickness;
 
-  
-  // exterior is limited by face width, 
-  // since it's larger than and flush with the carcas
-  side_ext_offset = face_width;
-  // interior is limited by the carcas plus the face overlap
-  side_int_offset = face_width - 2*carcas_thickness + carcas_thickness;
-
-  opening_width = division_width - 2*carcas_thickness;
+  opening_width = width - 2*carcas_thickness;
   
   X(max(face_width - face_overlay, carcas_thickness))
-  pieces(len(divisions))
-  X( 
-    spanAllButLast(width)
-  )
   storage_division(
-    divisions[every(1)],
+    division,
     opening_depth,
     opening_width,
     carcas_height=height,
@@ -250,7 +230,6 @@ module storage(
     face_panel_material=face_panel_material,
     face_overlay=face_overlay,
     depth_gap=depth_gap,
-    hide=hide,
     explode=explode
   );
 }

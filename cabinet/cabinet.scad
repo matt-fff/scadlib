@@ -3,7 +3,8 @@ include <constructive/constructive-compiled.scad>
 include <scadlib/common/cutlist.scad>
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
-include <scadlib/cabinet/carcas.scad>
+include <scadlib/cabinet/utils.scad>
+include <scadlib/cabinet/frame.scad>
 include <scadlib/cabinet/face.scad>
 include <scadlib/cabinet/storage.scad>
 include <scadlib/cabinet/kick_plate.scad>
@@ -24,7 +25,7 @@ module cabinet(
         dado_depth=undef,
         divisions=undef,
         explode=0,
-        hide=""
+        hide=[]
 ){
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
     depth = val_or_default(depth, TOT_DEPTH);
@@ -40,15 +41,31 @@ module cabinet(
     divisions = val_or_default(divisions, DIVISIONS);
     division_width = width / len(divisions);
 
-    col1 = pink;
-    col2 = red;
-    col3 = orange;
     explode_offset = explode * 150;
+
+    ext_parts = [
+      "kick",
+      "top",
+      "face",
+      "braces",
+      "frame",
+      "back",
+      "storage"
+    ];
+
+    int_parts = [
+      "frame-shelves"
+    ];
+   
 
     // OVERLAY COMPONENTS
     // These are parts that have to have context 
     // on the overall cabinet layout
-    if(!in("kick", hide)) {
+    assemble(
+      fmt_parts(ext_parts, hide),
+      fmt_parts(int_parts, hide)
+    ) autoColor() {
+      add("kick")
       Z(-explode_offset)
       TODOWN()
       kick_plate(
@@ -57,8 +74,8 @@ module cabinet(
           width=width,
           divisions=divisions
       );
-    }
-    if(!in("top", hide)) {
+
+      add("top")
       Z(explode_offset)
       clear()
       Z(
@@ -71,8 +88,8 @@ module cabinet(
           width=width,
           thickness=top_thickness
       );
-    }
-    if(!in("face", hide)) {
+
+      add("face")
       Y(explode_offset)
       clear(beige)
       face(
@@ -84,53 +101,107 @@ module cabinet(
           divisions=divisions,
           carcas_thickness=carcas_thickness
       );
-    }
 
-    // MODULAR COMPONENTS
-    // These are parts that only need
-    // to know their own dimensions
-    if(!in("carcas", hide)) {
-      clear()
-      carcas(
-          depth=depth,
-          height=height - kick_height - top_thickness,
-          width=width,
-          face_width=face_width,
-          face_thickness=face_thickness,
-          carcas_thickness=carcas_thickness,
-          drawer_height=drawer_height,
-          panel_thickness=panel_thickness,
-          dado_depth=dado_depth,
-          divisions=divisions,
-          explode=explode
+      // MODULAR COMPONENTS
+      // These are parts that only need
+      // to know their own dimensions
+
+      division_widths = division_carcas_widths(
+        width, face_width, carcas_thickness, divisions
       );
-    }
-    if(!in("back_panel", hide)) {
-      back_panel_set(
-          height=height - kick_height - top_thickness,
-          width=width,
-          carcas_thickness=carcas_thickness,
-          panel_thickness=panel_thickness,
-          dado_depth=dado_depth,
-          divisions=divisions,
-          explode=explode
-      );
-    }
-    if(!in("storage", hide)) {
-      clear(gold)
-      storage(
-        depth=depth,
-        height=height - kick_height - top_thickness,
-        width=width,
-        face_width=face_width,
-        face_trim_thickness=face_thickness,
-        drawer_height=drawer_height,
-        dado_depth=dado_depth,
-        panel_thickness=panel_thickness,
-        carcas_thickness=carcas_thickness,
-        divisions=divisions,
-        hide=hide,
-        explode=explode
-      );
+
+      cumulative_widths = accumulate(division_widths);
+
+      pieces(len(division_widths))
+      g() {
+        index = every(1);
+        div_width = division_widths[index];
+        cumu_width = cumulative_widths[index];
+        division = divisions[index];
+        modular_height = height - kick_height - top_thickness;
+        
+        g(X(cumu_width)) {
+          add("braces")
+          frame_braces(
+              depth=depth,
+              height=modular_height,
+              width=div_width,
+              explode=explode
+          );
+
+          add("frame")
+          assemble(){ 
+            add()
+            TOUP()
+            frame_outline(
+                depth=depth,
+                height=modular_height,
+                width=div_width
+            );
+
+            remove()
+            frame_storage(
+                div_width,
+                division,
+                depth=depth,
+                height=modular_height,
+                face_thickness=face_thickness,
+                carcas_thickness=carcas_thickness,
+                dado_depth=dado_depth,
+                panel_thickness=panel_thickness,
+                should_log=false
+            );
+
+            remove()
+            back_panel(
+                div_width,
+                height=height, // intentionally large
+                carcas_thickness=carcas_thickness,
+                panel_thickness=panel_thickness,
+                dado_depth=dado_depth,
+                should_log=false
+            );
+          }
+
+          add("frame-shelves")
+          frame_storage(
+              div_width,
+              division,
+              depth=depth,
+              height=modular_height,
+              face_thickness=face_thickness,
+              carcas_thickness=carcas_thickness,
+              dado_depth=dado_depth,
+              panel_thickness=panel_thickness
+          );
+
+
+          add("back")
+          back_panel(
+              div_width,
+              height=modular_height,
+              carcas_thickness=carcas_thickness,
+              panel_thickness=panel_thickness,
+              dado_depth=dado_depth,
+              explode=explode
+          );
+
+
+          add("storage")
+          storage(
+            div_width,
+            division,
+            depth=depth,
+            height=modular_height,
+            face_width=face_width,
+            face_trim_thickness=face_thickness,
+            drawer_height=drawer_height,
+            dado_depth=dado_depth,
+            panel_thickness=panel_thickness,
+            carcas_thickness=carcas_thickness,
+            explode=explode
+          );
+        }
+      }
     }
 }
