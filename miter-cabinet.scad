@@ -14,6 +14,7 @@ cabinet(
   explode=0,
   shelf_dado_depth=0,
   has_storage_faceplate=false,
+  uniform_carcas_widths=true,
   divisions=[
     [
       [BLANK, 0.19],

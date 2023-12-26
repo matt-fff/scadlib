@@ -55,7 +55,6 @@ module face_plate(
     face_width=undef,
     carcas_thickness=undef,
     divisions=undef,
-    has_storage_faceplate=true,
 ){
 
   g(
@@ -71,17 +70,6 @@ module face_plate(
         divisions=divisions
     );
 
-    if (has_storage_faceplate) {
-      face_plate_storage(
-          depth=depth,
-          height=height,
-          width=width,
-          face_thickness=face_thickness,
-          face_width=face_width,
-          carcas_thickness=carcas_thickness,
-          divisions=divisions
-      );
-    }
   }
   children();
 }
@@ -141,14 +129,14 @@ module face_plate_outline(
             subpart=vRepeat("bottom", "top")
         );
 
+        //
+        // FRAME STILES
+        //
         g(
           Z((stile_height + face_width)/2)
         ){
-          //
-          // FRAME VERTICAL DIVIDERS
-          //
-          
-          pieces(len(divisions) + 1)
+          // Left and right
+          pieces(2)
           X( 
             span(width - face_width)
           )
@@ -164,80 +152,4 @@ module face_plate_outline(
     }
     children();
 }
-
-
-module face_plate_storage(
-    depth=undef,
-    height=undef,
-    width=undef,
-    face_width=undef,
-    face_thickness=undef,
-    face_material=undef,
-    carcas_thickness=undef,
-    divisions=undef
-){
-  depth = val_or_default(depth, TOT_DEPTH);
-  height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
-  width = val_or_default(width, TOT_WIDTH);
-  face_width = val_or_default(face_width, FACE_WIDTH);
-  face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
-  face_material = val_or_default(face_material, FACE_MATERIAL);
-  carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
-  divisions = val_or_default(divisions, DIVISIONS);
-
-
-  material = face_material;
-  part = "face_plate_storage";
-
-  overall_opening_height = height - (
-    max(carcas_thickness, face_width)
-    + carcas_thickness
-  );
-
-  rail_width = (
-    width - (
-      max(2, len(divisions) + 1) * face_width
-    )
-  ) / len(divisions);
-  
-  X(face_width)
-  pieces(len(divisions))
-  X( 
-    spanAllButLast(width - face_width)
-  )
-  g() {
-    division = divisions[every(1)];
-
-    opening_heights = pct_to_val(overall_opening_height, division, split_size=face_width, idx=1);
-    nominal_heights = pct_to_val(height, division, idx=1);
-    cumulative_heights = accumulate(opening_heights);
-
-    g(
-        Z(
-            carcas_thickness/2
-        ),
-        TOREAR()
-    ){
-      pieces(len(division) - 1)
-      g(){
-        index = every(1) + 1;
-        height_offset = cumulative_heights[index] + index*face_width;
-
-        X(rail_width/2)
-        Z(height_offset - (face_width - carcas_thickness)/2)
-        logbox(
-            face_thickness,
-            x=rail_width,
-            h=face_width,
-            part=part,
-            material=material,
-            subpart="horiz-divider"
-        );
-      }
-    }
-  }
-
-  children();
-}
-
 

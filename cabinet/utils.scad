@@ -1,13 +1,14 @@
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/const.scad>
  
-function division_carcas_widths(
+function division_widths(
   tot_width,
   face_width,
   carcas_thickness,
-  divisions
+  divisions,
+  force_uniform=false
 ) = (
-  len(divisions) <= 2 ? (
+  len(divisions) <= 2 || force_uniform ? (
   let(
       div_width = len(divisions) > 0 ? tot_width / len(divisions) : 0
     ) [for (i=divisions) div_width]

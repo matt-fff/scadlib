@@ -28,6 +28,7 @@ module cabinet(
         face_overlay=undef,
         storage_protrusion=undef,
         has_storage_faceplate=true,
+        uniform_carcas_widths=false,
         explode=0,
         hide=[]
 ){
@@ -60,10 +61,12 @@ module cabinet(
     ext_parts = [
       "kick",
       "top",
-      "face_plate",
+      "face-outline",
       "braces",
       "frame",
-      "back"
+      "back",
+      "face-stiles",
+      "face-rails"
     ];
 
     int_parts = [
@@ -106,7 +109,7 @@ module cabinet(
           thickness=top_thickness
       );
 
-      add("face_plate")
+      add("face-outline")
       Y(explode_offset)
       clear(beige)
       face_plate(
@@ -116,19 +119,24 @@ module cabinet(
           face_thickness=face_thickness,
           face_width=face_width,
           divisions=divisions,
-          carcas_thickness=carcas_thickness,
-          has_storage_faceplate=has_storage_faceplate
+          carcas_thickness=carcas_thickness
       );
 
       // MODULAR COMPONENTS
       // These are parts that only need
       // to know their own dimensions
 
-      division_widths = division_carcas_widths(
-        width, face_width, carcas_thickness, divisions
+      division_widths = division_widths(
+        width,
+        face_width,
+        carcas_thickness,
+        divisions,
+        force_uniform=uniform_carcas_widths
       );
+      nominal_widths = [for (i = [0 : div_count - 1]) width/div_count];
 
-      cumulative_widths = accumulate(division_widths);
+      cumu_actual_widths = accumulate(division_widths);
+      cumu_nominal_widths = accumulate(nominal_widths);
 
       pieces(div_count)
       g() {
@@ -136,11 +144,15 @@ module cabinet(
         is_first = index == 0;
         is_last = index == div_count - 1;
         div_width = division_widths[index];
-        cumu_width = cumulative_widths[index];
         division = divisions[index];
         modular_height = height - kick_height - top_thickness;
         
-        g(X(cumu_width)) {
+        // Because of the way the face sides may overhange inwards on
+        // the edge cabinets, we sometimes need to cut the size of components
+        should_reduce = is_first || is_last;
+        edge_reduction = face_width/2;
+
+        g(X(cumu_actual_widths[index])) {
           add("braces")
           TOUP()
           frame_braces(
@@ -210,9 +222,6 @@ module cabinet(
           );
 
           
-          should_reduce = is_first || is_last;
-          edge_reduction = face_width/2;
-
            
           add("storage")
           X(is_first ? edge_reduction : 0)
@@ -231,6 +240,67 @@ module cabinet(
             carcas_thickness=carcas_thickness,
             explode=explode
           );
+        }
+
+        stile_offset = uniform_carcas_widths ? cumu_nominal_widths[index] : cumu_actual_widths[index];
+        g(X(stile_offset)) {
+          overall_opening_height = height - face_width - carcas_thickness - kick_height - top_thickness;
+          g(
+            Y(depth - face_thickness/2)
+            //X((face_width/2 - carcas_thickness)/2)
+          ){
+            //
+            // FRAME VERTICAL DIVIDERS
+            //
+            if (!is_first) {
+              add("face-stiles")
+              Z((overall_opening_height)/2+face_thickness)
+              logbox(
+                  face_thickness,
+                  x=face_width,
+                  h=overall_opening_height,
+                  part="face_plate",
+                  material=FACE_MATERIAL,
+                  subpart="vert-divider"
+              );
+            }
+
+            if (has_storage_faceplate) {
+              opening_heights = pct_to_val(overall_opening_height, division, split_size=face_width, idx=1);
+              nominal_heights = pct_to_val(height, division, idx=1);
+              cumulative_heights = accumulate(opening_heights);
+
+              rail_width = div_width - face_width*(
+                should_reduce ? 1.5 : 1
+              );
+
+              add("face-rails")
+              g(
+                  Z(
+                      carcas_thickness/2
+                  ),
+                  X((rail_width+face_width)/2),
+                  X(is_first ? edge_reduction : 0)
+              ){
+                pieces(len(division) - 1)
+                g(){
+                  index = every(1) + 1;
+
+                  height_offset = cumulative_heights[index] + index*face_width;
+
+                  Z(height_offset - (face_width - carcas_thickness)/2)
+                  logbox(
+                      face_thickness,
+                      x=rail_width,
+                      h=face_width,
+                      part=part,
+                      material=material,
+                      subpart="horiz-divider"
+                  );
+                }
+              }
+            }
+          }
         }
       }
     }
