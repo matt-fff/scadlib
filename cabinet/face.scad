@@ -2,9 +2,52 @@ include <constructive/constructive-compiled.scad>
 include <scadlib/common/cutlist.scad>
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
+include <scadlib/cabinet/faces/slab.scad>
+include <scadlib/cabinet/faces/shaker.scad>
 
+module storage_face(
+  opening_width,
+  opening_height,
+  face_style=undef,
+  trim_thickness=undef,
+  trim_width=undef,
+  trim_overlay=undef,
+  trim_material=undef,
+  tenon_thickness=undef,
+  tenon_depth=undef,
+  panel_thickness=undef,
+  panel_material=undef,
+  part=undef,
+  hide=[]
+){
 
-module face(
+    face_style = val_or_default(face_style, SLAB);
+
+    if(face_style == SHAKER) {
+      shaker_face(
+        opening_width=opening_width,
+        opening_height=opening_height,
+        trim_thickness=trim_thickness,
+        trim_width=trim_width,
+        trim_material=trim_material,
+        trim_overlay=trim_overlay,
+        panel_thickness=panel_thickness,
+        panel_material=panel_material,
+        part=part
+      );
+    } else if(face_style == SLAB) {
+      slab_face(
+        opening_width=opening_width,
+        opening_height=opening_height,
+        face_overlay=trim_overlay,
+        thickness=trim_thickness,
+        material=trim_material,
+        part=part
+      );
+    }
+}
+
+module face_plate(
     depth=undef,
     height=undef,
     width=undef,
@@ -142,6 +185,11 @@ module face_plate_storage(
   material = face_material;
   part = "face_plate_storage";
 
+  overall_opening_height = height - (
+    max(carcas_thickness, face_width)
+    + carcas_thickness
+  );
+
   rail_width = (
     width - (
       max(2, len(divisions) + 1) * face_width
@@ -156,29 +204,30 @@ module face_plate_storage(
   g() {
     division = divisions[every(1)];
 
-    heights = [for (d = division) height*d[1]];
-    cumulative_heights = accumulate(heights);
+    opening_heights = pct_to_val(overall_opening_height, division, split_size=face_width, idx=1);
+    nominal_heights = pct_to_val(height, division, idx=1);
+    cumulative_heights = accumulate(opening_heights);
 
     g(
         Z(
-            face_width/2
+            carcas_thickness/2
         ),
         TOREAR()
     ){
-      pieces(len(division))
+      pieces(len(division) - 1)
       g(){
-        index = every(1);
-        height_offset = cumulative_heights[index];
+        index = every(1) + 1;
+        height_offset = cumulative_heights[index] + index*face_width;
 
         X(rail_width/2)
-        Z(height_offset)
+        Z(height_offset - (face_width - carcas_thickness)/2)
         logbox(
             face_thickness,
             x=rail_width,
             h=face_width,
             part=part,
             material=material,
-            subpart="center_divider"
+            subpart="horiz-divider"
         );
       }
     }

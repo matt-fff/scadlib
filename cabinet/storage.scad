@@ -10,6 +10,7 @@ module storage_subdivision(
     opening_depth,
     opening_width,
     opening_height,
+    face_style=undef,
     face_trim_thickness=undef,
     face_trim_material=undef,
     dado_depth=undef,
@@ -29,10 +30,6 @@ module storage_subdivision(
     bottom_recess=undef,
     explode=0
 ){
-  panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
-  carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
-  depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
-  bottom_gap = val_or_default(bottom_gap, DRAWER_BOTTOM_GAP);
   face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
 
 
@@ -41,11 +38,12 @@ module storage_subdivision(
         opening_depth,
         opening_width,
         opening_height,
+        face_style=face_style,
         depth_gap=depth_gap,
         top_gap=top_gap,
         bottom_gap=bottom_gap,
         bottom_recess=bottom_recess,
-        bottom_thickness=panel_thickness,
+        panel_thickness=panel_thickness,
         bottom_material=bottom_material,
         shell_thickness=carcas_thickness,
         shell_material=carcas_material,
@@ -65,6 +63,7 @@ module storage_subdivision(
         opening_depth,
         opening_width,
         opening_height,
+        face_style=face_style,
         carcas_thickness=carcas_thickness,
         face_trim_thickness=face_trim_thickness,
         face_trim_material=face_trim_material,
@@ -86,6 +85,7 @@ module storage_subdivision(
         opening_depth,
         door_width,
         opening_height,
+        face_style=face_style,
         carcas_thickness=carcas_thickness,
         face_trim_thickness=face_trim_thickness,
         face_trim_material=face_trim_material,
@@ -132,29 +132,35 @@ module storage_division(
     nominal_drawer_height = val_or_default(nominal_drawer_height, DRAWER_HEIGHT);
     face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
 
+    // The actual opening is the carcas_height minus the thickness
+    // of the shell/trim on the top and bottom
+    overall_opening_height = carcas_height - (face_width + carcas_thickness);
+    overall_nominal_height = carcas_height + face_overlay*2;
+
     explode_offset = explode * opening_depth;
     types = [for (d = division) d[0]];
-    heights = [for (d = division) carcas_height*d[1]];
-    cumulative_heights = accumulate(heights);
+    opening_heights = pct_to_val(overall_opening_height, division, split_size=face_width, idx=1);
+    nominal_heights = pct_to_val(overall_nominal_height, division, idx=1);
+    styles = [for (d = division) len(d) < 3 ? SLAB : d[2]];
+    cumulative_heights = accumulate(opening_heights);
+
     g(
         Y(
-            carcas_thickness
-            + panel_thickness
+            explode_offset
             + depth_gap
-            + explode_offset
         ),
         Z(
-            carcas_thickness/2
-            + bottom_gap
+            carcas_thickness
         ),
+        X(-opening_width/2),
         TOREAR()
     ){
       pieces(len(division))
       g(){
         index = every(1);
-        nominal_height = heights[index];
-        opening_height = nominal_height - 2*face_trim_thickness;
-        height_offset = cumulative_heights[index];
+        opening_height = opening_heights[index];
+        nominal_height = nominal_heights[index];
+        height_offset = cumulative_heights[index] + index*face_width;
 
         Z(height_offset)
         storage_subdivision(
@@ -162,6 +168,7 @@ module storage_division(
           opening_depth,
           opening_width,
           opening_height,
+          face_style=styles[index],
           carcas_height=carcas_height,
           face_width=face_width,
           face_trim_thickness=face_trim_thickness,
@@ -176,7 +183,8 @@ module storage_division(
           face_panel_material=face_panel_material,
           face_overlay=face_overlay,
           depth_gap=depth_gap,
-          explode=explode
+          explode=explode,
+          bottom_gap=bottom_gap
         );
       }
     }
@@ -185,6 +193,7 @@ module storage_division(
 module storage(
     width,
     division,
+    protrusion=undef,
     depth=undef,
     height=undef,
     face_width=undef,
@@ -206,11 +215,18 @@ module storage(
 
   depth = val_or_default(depth, TOT_DEPTH);
   face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
-  opening_depth = depth - panel_thickness - carcas_thickness;
+  carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
+  panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
+  depth_gap = val_or_default(depth_gap, DRAWER_DEPTH_GAP);
+  protrusion = val_or_default(protrusion, 0);
+  opening_depth = depth - (
+    panel_thickness 
+    + carcas_thickness
+  ) + protrusion;
 
-  opening_width = width - 2*carcas_thickness;
+  opening_width = width - max(2*carcas_thickness, face_width);
   
-  X(max(face_width - face_overlay, carcas_thickness))
+  X(width/2)
   storage_division(
     division,
     opening_depth,

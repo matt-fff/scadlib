@@ -29,8 +29,9 @@ function fmt_parts(parts, hidden) = join(remove_intersection(parts, hidden), ","
 
 module validate_division(division) {
   for (div = division) {
-    assert(len(div) == 2);
-    assert(in(div[0], [DOOR, DOUBLE_DOOR, DRAWER]));
+    assert(len(div) >= 2);
+    assert(len(div) <= 3);
+    assert(in(div[0], [DOOR, DOUBLE_DOOR, DRAWER, BLANK]));
     assert(div[1] <= 1);
     assert(div[1] > 0);
   }
@@ -46,3 +47,18 @@ module validate_divisions(divisions) {
       validate_division(division);
     }
 }
+
+function pct_to_val(
+  overall,
+  divisions,
+  split_size=0,
+  idx=undef
+) = (
+   [
+     for (d = divisions) (
+      overall - (
+        split_size * (len(divisions) - 1)
+      )
+     )*(idx == undef ? d : d[idx])
+   ]
+);

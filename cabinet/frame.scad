@@ -118,6 +118,7 @@ module frame_storage(
     depth=undef,
     height=undef,
     face_thickness=undef,
+    face_width=undef,
     carcas_thickness=undef,
     dado_depth=undef,
     panel_thickness=undef,
@@ -126,6 +127,7 @@ module frame_storage(
     depth = val_or_default(depth, TOT_DEPTH);
     height = val_or_default(height, TOT_HEIGHT - KICK_HEIGHT - TOP_THICKNESS);
     face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
+    face_width = val_or_default(face_width, FACE_WIDTH);
     carcas_thickness = val_or_default(carcas_thickness, CARCAS_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
@@ -145,10 +147,13 @@ module frame_storage(
         width +
         (dado_depth - carcas_thickness)*2
     );
+
+    overall_opening_height = height - (face_width + carcas_thickness);
     
 
-    heights = [for (d = division) height*d[1]];
-    cumulative_heights = accumulate(heights);
+    opening_heights = pct_to_val(overall_opening_height, division, split_size=face_width, idx=1);
+    nominal_heights = pct_to_val(height, division, idx=1);
+    cumulative_heights = accumulate(opening_heights);
 
     g(
         TOREAR(),
@@ -162,15 +167,15 @@ module frame_storage(
       pieces(len(division))
       g(){
         index = every(1);
-        height_offset = cumulative_heights[index];
         type = division[index][0];
 
         // We only need dividers for door boundaries
         needs_divider = index != 0 && (
-          type == DOOR || type == DOUBLE_DOOR || type != division[index-1][0]
+          type != DRAWER || type != division[index-1][0]
         );
 
-        if (needs_divider)
+        if (needs_divider) {
+          height_offset = cumulative_heights[index] + index*face_width;
           Z(height_offset)
           logbox(
               divider_depth,
@@ -181,6 +186,7 @@ module frame_storage(
               subpart="horiz-divider",
               should_log=should_log
           );
+        }
       }
     }
 

@@ -24,6 +24,8 @@ module cabinet(
         panel_thickness=undef,
         dado_depth=undef,
         divisions=undef,
+        face_overlay=undef,
+        storage_protrusion=undef,
         explode=0,
         hide=[]
 ){
@@ -39,22 +41,31 @@ module cabinet(
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     dado_depth = val_or_default(dado_depth, DADO_DEPTH);
     divisions = val_or_default(divisions, DIVISIONS);
-    division_width = width / len(divisions);
+    face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
+    storage_protrusion = val_or_default(
+      storage_protrusion,
+      face_overlay == 0 ? 0 : face_thickness
+    );
+    div_count = len(divisions);
+    division_width = width / div_count;
+
+    assert(face_width > carcas_thickness*2);
+
 
     explode_offset = explode * 150;
 
     ext_parts = [
       "kick",
       "top",
-      "face",
+      "face_plate",
       "braces",
       "frame",
-      "back",
-      "storage"
+      "back"
     ];
 
     int_parts = [
-      "frame-shelves"
+      "frame-shelves",
+      "storage"
     ];
 
 
@@ -92,10 +103,10 @@ module cabinet(
           thickness=top_thickness
       );
 
-      add("face")
+      add("face_plate")
       Y(explode_offset)
       clear(beige)
-      face(
+      face_plate(
           depth=depth,
           height=height - kick_height - top_thickness,
           width=width,
@@ -115,9 +126,11 @@ module cabinet(
 
       cumulative_widths = accumulate(division_widths);
 
-      pieces(len(division_widths))
+      pieces(div_count)
       g() {
         index = every(1);
+        is_first = index == 0;
+        is_last = index == div_count - 1;
         div_width = division_widths[index];
         cumu_width = cumulative_widths[index];
         division = divisions[index];
@@ -149,6 +162,7 @@ module cabinet(
                 division,
                 depth=depth,
                 height=modular_height,
+                face_width=face_width,
                 face_thickness=face_thickness,
                 carcas_thickness=carcas_thickness,
                 dado_depth=dado_depth,
@@ -173,6 +187,7 @@ module cabinet(
               division,
               depth=depth,
               height=modular_height,
+              face_width=face_width,
               face_thickness=face_thickness,
               carcas_thickness=carcas_thickness,
               dado_depth=dado_depth,
@@ -190,15 +205,22 @@ module cabinet(
               explode=explode
           );
 
+          
+          should_reduce = is_first || is_last;
+          edge_reduction = face_width/2;
 
+           
           add("storage")
+          X(is_first ? edge_reduction : 0)
           storage(
-            div_width,
+            div_width - (should_reduce ? edge_reduction : 0),
             division,
+            protrusion=storage_protrusion,
             depth=depth,
             height=modular_height,
             face_width=face_width,
             face_trim_thickness=face_thickness,
+            face_overlay=face_overlay,
             drawer_height=drawer_height,
             dado_depth=dado_depth,
             panel_thickness=panel_thickness,

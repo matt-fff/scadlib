@@ -257,7 +257,7 @@ module shaker_face(
   tenon_depth=undef,
   panel_thickness=undef,
   panel_material=undef,
-  part="face",
+  part="shaker-face",
   hide=[]
 ){
     parts = [

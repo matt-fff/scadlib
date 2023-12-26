@@ -2,7 +2,7 @@ include <constructive/constructive-compiled.scad>
 include <scadlib/common/cutlist.scad>
 include <scadlib/common/utils.scad>
 include <scadlib/cabinet/defaults.scad>
-include <scadlib/cabinet/shaker.scad>
+include <scadlib/cabinet/face.scad>
 
 DRAWER_WIDTH = DIVISION_WIDTH;
 DRAWER_WIDTH_GAP = 42;
@@ -10,7 +10,7 @@ DRAWER_DEPTH = inch_to_mm(15);
 DRAWER_TOP_GAP = 10;
 DRAWER_BOTTOM_GAP = 14;
 DRAWER_BOTTOM_RECESS = 13;
-DRAWER_DEPTH_GAP = inch_to_mm(1/4);
+DRAWER_DEPTH_GAP = inch_to_mm(5/8);
 
 MIN_RUNNER_LEN = inch_to_mm(15 + 11/16);
 MAX_RUNNER_LEN = inch_to_mm(17);
@@ -57,11 +57,12 @@ module drawer(
     opening_depth,
     opening_width,
     opening_height,
+    face_style=undef,
     depth_gap=undef,
     top_gap=undef,
     bottom_gap=undef,
     bottom_recess=undef,
-    bottom_thickness=undef,
+    panel_thickness=undef,
     bottom_material=undef,
     shell_thickness=undef,
     shell_material=undef,
@@ -80,7 +81,7 @@ module drawer(
     top_gap = val_or_default(top_gap, DRAWER_TOP_GAP);
     bottom_gap = val_or_default(bottom_gap, DRAWER_BOTTOM_GAP);
     bottom_recess = val_or_default(bottom_recess, DRAWER_BOTTOM_RECESS);
-    bottom_thickness = val_or_default(bottom_thickness, PANEL_THICKNESS);
+    panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
     shell_thickness = val_or_default(shell_thickness, CARCAS_THICKNESS);
     shell_material = val_or_default(shell_material, CARCAS_MATERIAL);
     face_trim_thickness = val_or_default(face_trim_thickness, FACE_THICKNESS);
@@ -98,7 +99,7 @@ module drawer(
     center_offset = (opening_width - shell_thickness) / 2; // TODO probably wrong
     shell_height = opening_height - height_gap;
     shell_width = opening_width - relative_width_gap;
-    shell_depth = opening_depth - depth_gap;
+    shell_depth = opening_depth - depth_gap - face_trim_thickness;
 
     ext_parts = [
       "drawer-face"
@@ -114,6 +115,7 @@ module drawer(
       // TODO Might be bullshit
       shell_thickness/2
     ) 
+    Y(shell_thickness + panel_thickness)
     assemble(
       fmt_parts(ext_parts, hide),
       fmt_parts(int_parts, hide)
@@ -123,7 +125,7 @@ module drawer(
         ){
           // Rear
           add("drawer-rear")
-          Z(bottom_thickness)
+          Z(panel_thickness)
           X(center_offset)
           logbox(
               shell_thickness,
@@ -138,7 +140,7 @@ module drawer(
           Z(
             -(
               shell_height 
-              - bottom_thickness
+              - panel_thickness
             )/2 
             + bottom_recess
           )
@@ -199,9 +201,10 @@ module drawer(
 
       // Face
       add("drawer-face")
-      Y(opening_depth)
+      Y(shell_depth)
       X(-face_trim_thickness/2)
-      shaker_face(
+      storage_face(
+        face_style=face_style,
         opening_width=opening_width,
         opening_height=opening_height,
         trim_thickness=face_trim_thickness,
