@@ -13,6 +13,7 @@ cabinet(
   storage_protrusion=0,
   explode=0,
   shelf_dado_depth=0,
+  has_storage_faceplate=false,
   divisions=[
     [
       [BLANK, 0.19],

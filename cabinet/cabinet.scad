@@ -27,6 +27,7 @@ module cabinet(
         divisions=undef,
         face_overlay=undef,
         storage_protrusion=undef,
+        has_storage_faceplate=true,
         explode=0,
         hide=[]
 ){
@@ -115,7 +116,8 @@ module cabinet(
           face_thickness=face_thickness,
           face_width=face_width,
           divisions=divisions,
-          carcas_thickness=carcas_thickness
+          carcas_thickness=carcas_thickness,
+          has_storage_faceplate=has_storage_faceplate
       );
 
       // MODULAR COMPONENTS

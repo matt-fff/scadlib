@@ -54,7 +54,8 @@ module face_plate(
     face_thickness=undef,
     face_width=undef,
     carcas_thickness=undef,
-    divisions=undef
+    divisions=undef,
+    has_storage_faceplate=true,
 ){
 
   g(
@@ -69,15 +70,18 @@ module face_plate(
         carcas_thickness=carcas_thickness,
         divisions=divisions
     );
-    face_plate_storage(
-        depth=depth,
-        height=height,
-        width=width,
-        face_thickness=face_thickness,
-        face_width=face_width,
-        carcas_thickness=carcas_thickness,
-        divisions=divisions
-    );
+
+    if (has_storage_faceplate) {
+      face_plate_storage(
+          depth=depth,
+          height=height,
+          width=width,
+          face_thickness=face_thickness,
+          face_width=face_width,
+          carcas_thickness=carcas_thickness,
+          divisions=divisions
+      );
+    }
   }
   children();
 }
