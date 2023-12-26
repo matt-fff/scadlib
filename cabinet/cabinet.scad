@@ -22,7 +22,8 @@ module cabinet(
         carcas_thickness=undef,
         drawer_height=undef,
         panel_thickness=undef,
-        dado_depth=undef,
+        shelf_dado_depth=undef,
+        panel_dado_depth=undef,
         divisions=undef,
         face_overlay=undef,
         storage_protrusion=undef,
@@ -39,7 +40,8 @@ module cabinet(
     face_thickness = val_or_default(face_thickness, FACE_THICKNESS);
     drawer_height = val_or_default(drawer_height, DRAWER_HEIGHT);
     panel_thickness = val_or_default(panel_thickness, PANEL_THICKNESS);
-    dado_depth = val_or_default(dado_depth, DADO_DEPTH);
+    panel_dado_depth = val_or_default(panel_dado_depth, DADO_DEPTH);
+    shelf_dado_depth = val_or_default(shelf_dado_depth, DADO_DEPTH);
     divisions = val_or_default(divisions, DIVISIONS);
     face_overlay = val_or_default(face_overlay, FACE_OVERLAY);
     storage_protrusion = val_or_default(
@@ -165,7 +167,7 @@ module cabinet(
                 face_width=face_width,
                 face_thickness=face_thickness,
                 carcas_thickness=carcas_thickness,
-                dado_depth=dado_depth,
+                dado_depth=shelf_dado_depth,
                 panel_thickness=panel_thickness,
                 should_log=false
             );
@@ -176,7 +178,7 @@ module cabinet(
                 height=height, // intentionally large
                 carcas_thickness=carcas_thickness,
                 panel_thickness=panel_thickness,
-                dado_depth=dado_depth,
+                dado_depth=panel_dado_depth,
                 should_log=false
             );
           }
@@ -190,7 +192,7 @@ module cabinet(
               face_width=face_width,
               face_thickness=face_thickness,
               carcas_thickness=carcas_thickness,
-              dado_depth=dado_depth,
+              dado_depth=shelf_dado_depth,
               panel_thickness=panel_thickness
           );
 
@@ -201,7 +203,7 @@ module cabinet(
               height=modular_height,
               carcas_thickness=carcas_thickness,
               panel_thickness=panel_thickness,
-              dado_depth=dado_depth,
+              dado_depth=panel_dado_depth,
               explode=explode
           );
 
@@ -222,7 +224,7 @@ module cabinet(
             face_trim_thickness=face_thickness,
             face_overlay=face_overlay,
             drawer_height=drawer_height,
-            dado_depth=dado_depth,
+            dado_depth=panel_dado_depth,
             panel_thickness=panel_thickness,
             carcas_thickness=carcas_thickness,
             explode=explode

@@ -12,6 +12,7 @@ cabinet(
   face_overlay=0,
   storage_protrusion=0,
   explode=0,
+  shelf_dado_depth=0,
   divisions=[
     [
       [DRAWER, 0.40, SLAB],
