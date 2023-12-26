@@ -15,40 +15,50 @@ cabinet(
   shelf_dado_depth=0,
   divisions=[
     [
-      [DRAWER, 0.40, SLAB],
-      [DRAWER, 0.20, SLAB],
-      [DRAWER, 0.20, SLAB],
-      [DRAWER, 0.20, SLAB],
+      [BLANK, 0.19],
+      [BLANK, 0.19],
+      [BLANK, 0.19],
+      [BLANK, 0.43],
     ],
 
     [
+      [BLANK, 0.50],
       [BLANK, 0.25],
       [BLANK, 0.25],
-      [DOUBLE_DOOR, 0.50]
     ],
     
     [
-      [DOOR, 0.333],
-      [DOOR, 0.333],
-      [DOOR, 0.333]
-    ],
-
-
-    [
-      [DRAWER, 0.25],
-      [DOOR, 0.75]
+      [BLANK, 0.43],
+      [BLANK, 0.19],
+      [BLANK, 0.19],
+      [BLANK, 0.19],
     ],
 
     [
-      [DOUBLE_DOOR, 0.50],
-      [DRAWER, 0.25],
-      [DRAWER, 0.25]
+      [BLANK, 0.25],
+      [BLANK, 0.25],
+      [BLANK, 0.50],
     ],
 
     [
-      [DOOR, 0.75],
-      [DRAWER, 0.25]
-    ]
+      [BLANK, 0.43],
+      [BLANK, 0.19],
+      [BLANK, 0.19],
+      [BLANK, 0.19],
+    ],
+    
+    [
+      [BLANK, 0.50],
+      [BLANK, 0.25],
+      [BLANK, 0.25],
+    ],
+
+    [
+      [BLANK, 0.19],
+      [BLANK, 0.19],
+      [BLANK, 0.19],
+      [BLANK, 0.43],
+    ],
   ],
   hide=[]
 );
