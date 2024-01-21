@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import json
 import csv
+import math
 from fractions import Fraction
 from collections import defaultdict
 from itertools import groupby
@@ -240,6 +241,7 @@ def format_output(
     fraction: bool = False,
     metric: bool = False,
     stock: Optional[str] = None,
+    max_dimension: float = float("inf"),
 ) -> Generator[Dict[str, Any], None, None]:
     for row in sorted(
         dimensions,
@@ -249,18 +251,28 @@ def format_output(
         if stock and row["material"] != stock:
             continue
 
-        part_counts = "\n".join(
-            [f"{key}:{count}" for key, count in row["part_counts"].items()]
-        )
+        count_modifier = 1
+        dims = {}
+        for key in ["thickness", "width", "length"]:
+            val = row[key]
 
-        dims = {
-            key: format_num(row[key], fraction=fraction, metric=metric)
-            for key in ["thickness", "width", "length"]
-        }
+            if val > max_dimension:
+                split_count = math.ceil(val / max_dimension)
+                val = val / split_count
+                count_modifier *= split_count
+
+            dims[key] = format_num(val, fraction=fraction, metric=metric)
+
+        part_counts = "\n".join(
+            [
+                f"{key}:{count * count_modifier}"
+                for key, count in row["part_counts"].items()
+            ]
+        )
 
         yield {
             "material": row["material"],
-            "count": row["count"],
+            "count": row["count"] * count_modifier,
             "parts": part_counts,
             **dims,
         }
@@ -279,7 +291,11 @@ def main(args: argparse.Namespace) -> None:
     dimensions = get_dimensions(file_path)
     consolidated = consolidate_dimensions(dimensions)
     formatted = format_output(
-        consolidated, fraction=args.fraction, metric=args.metric, stock=args.stock
+        consolidated,
+        fraction=args.fraction,
+        metric=args.metric,
+        stock=args.stock,
+        max_dimension=args.max_dimension,
     )
 
     if args.export:
@@ -328,6 +344,17 @@ if __name__ == "__main__":
         nargs="+",
         type=str,
         help="Optional header ordering for export file.",
+    )
+
+    # TODO support a distinct max dimension on 2 planes.
+    # as-is, if you can only access assymetric stock (4x8),
+    # you can have impossible values like 6x6
+    # TODO support a distrinct max for different materials.
+    parser.add_argument(
+        "--max-dimension",
+        default=float("inf"),
+        type=float,
+        help="If provided, any dimension over this limit will be subdivided",
     )
 
     args = parser.parse_args()
