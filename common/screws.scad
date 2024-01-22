@@ -301,4 +301,4 @@ module screw_demo() {
     back(25)zrot(180)xrot(-9)nut_test();
 }
 
-screw_demo();
+//screw_demo();
