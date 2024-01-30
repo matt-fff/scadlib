@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
 import argparse
-import subprocess
-import tempfile
-import json
 import csv
+import json
 import math
-from fractions import Fraction
+import subprocess  # nosec B404
+import tempfile
 from collections import defaultdict
+from fractions import Fraction
 from itertools import groupby
 from operator import itemgetter
-from typing import Optional, List, Any, Dict, Iterable, Union, Generator
 from pathlib import Path
+from typing import Any, Dict, Generator, Iterable, List, Optional, Union
+
 from rich.console import Console
 from rich.table import Table
 
@@ -80,7 +81,7 @@ def get_dimensions(file_path: Path) -> List[Dict[str, Any]]:
         command = ["openscad", str(file_path), "-o", str(export_path)]
 
         # Run the command and capture the output
-        process = subprocess.Popen(
+        process = subprocess.Popen(  # nosec B603
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         _, stderr = process.communicate()
