@@ -11,12 +11,7 @@ targetFolder="$1"
 find "${targetFolder}" \
 	-type f \
 	-regextype posix-extended \
-	-iregex ".*\.(png|jpg)" \
-	-exec cwebp -q 100 {} -o {}.webp \;
-
-# Fix the webp copy locations
-find "${targetFolder}" \
-	-type f \
-	-regextype posix-extended \
-	-iregex ".*\.(png|jpg)\.webp" \
-	-exec sh -c 'for f; do mv "$f" "${f%.*}.webp"; done' sh {} +
+	-iregex ".*\.png" \
+	-exec sh -c \
+	'f="$1"; base=$(basename "$f" .png); cwebp -q 100 "$f" -o "exports/img/${base}.webp"' \
+	shell {} \;
