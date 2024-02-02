@@ -6,9 +6,9 @@ include <BOSL2/skin.scad>
 
 
 function blade_outline(
-  thickness=10,
-  cheek_width=30,
-  bevel_len=10
+  thickness,
+  cheek_width,
+  bevel_len
 ) = 
   assert(
     bevel_len*2 > thickness,
@@ -46,13 +46,14 @@ module handle_guard(
     sweep(
       egg(diam*1.01, diam/2, diam/2, 60),
       turtle3d([
-          ["move", coeff*0.05, "grow", 1.03, "steps", 20], 
-          ["move", coeff*0.1, "grow", 1.03, "steps", 20], 
+          // TODO try to make this more gradual so that it prints cleaner
+          ["move", coeff*0.05, "grow", 1.15, "steps", 20], 
+          ["move", coeff*0.1, "grow", 1.15, "steps", 20], 
           "move", coeff*0.1,
           ["arc", coeff, "up", angle, "steps", 80],
-          ["move", coeff*0.6, "shrink", 1.05, "steps", 20],
-          ["move", coeff*0.1, "grow", 1.03, "steps", 20], 
-          ["move", coeff*0.05, "shrink", 1.03, "steps", 20], 
+          ["move", coeff*0.6, "grow", 1.05, "steps", 20],
+          ["move", coeff*0.1, "grow", 1.07, "steps", 20], 
+          ["move", coeff*0.05, "grow", 1.05, "steps", 20], 
           ["move", coeff*0.05, "shrink", 1.05, "steps", 20], 
           ["move", coeff*0.05, "shrink", 1.05, "steps", 20], 
           ["move", coeff*0.01, "shrink", 1.05, "steps", 20], 
@@ -64,7 +65,7 @@ module handle_guard(
       )
     );
 
-    bolt_height = diam + inch_to_mm(0.2);
+    bolt_height = diam*1.5;
     // The guard bolts
     
     // Bullshit translation
@@ -83,16 +84,16 @@ module handle_interlock(
   diam,
   male=false,
   margin_ratio=0.02,
-  magnet_diam = 10.25,
-  magnet_depth = 2.8
+  magnet_diam=8,
+  magnet_depth=6
 ){
     multiplier = male ? -1: 1;
     size_adj = 1 + margin_ratio*multiplier;
      
     difference(){
       cyl(
-        h=length,
-        d=diam
+        h=length*size_adj,
+        d=diam*size_adj
       );
 
       if(male){
@@ -109,9 +110,9 @@ module handle_interlock(
 }
 
 module handle_half(
-  length=inch_to_mm(7+5/8),
-  diam=inch_to_mm(1.5),
-  guard_angle=25,
+  length,
+  diam,
+  guard_angle,
   wall_thickness=inch_to_mm(0.2),
   male=false
 ) {
@@ -121,57 +122,48 @@ module handle_half(
   interlock_len = core_len/2-wall_thickness;
   interlock_diam = diam-wall_thickness*2;
 
-  translate([0, 0, core_len/4])
   union(){
-    difference(){
-    
-      // Handle
-      cyl(
-        h=core_len/2,
-        d=diam
-      );
+    translate([0, 0, core_len/4])
+    union(){
+      difference(){
 
-      // Void for interlock
-      if(!male) {
-        translate([0, 0, -wall_thickness])
+        // Handle
+        cyl(
+          h=core_len/2,
+          d=diam
+        );
+
+        // Void for interlock
+        if(!male) {
+          translate([0, 0, -wall_thickness])
+          handle_interlock(interlock_len, interlock_diam, male=male);
+        }
+      }
+
+      // Extension for interlock
+      if(male) {
+        translate([0, 0, -core_len/2+wall_thickness])
         handle_interlock(interlock_len, interlock_diam, male=male);
       }
     }
 
-    // Extension for interlock
-    if(male) {
-      translate([0, 0, -core_len/2+wall_thickness])
-      handle_interlock(interlock_len, interlock_diam, male=male);
-    }
-  }
-  
-  guard_coeff = (length - core_len) / 2;
+    guard_coeff = (length - core_len) / 2;
 
-  translate([0, 0, core_len/2])
-  handle_guard(
-    coeff=guard_coeff,
-    angle=guard_angle,
-    diam=diam
-  );
+    translate([0, 0, core_len/2-1])
+    handle_guard(
+      coeff=guard_coeff,
+      angle=guard_angle,
+      diam=diam
+    );
+  }
 }
 
 module blade_half(
   thickness=10,
-  cheek_width=10,
-  bevel_len=20
+  cheek_width=12,
+  bevel_len=20,
+  explode=0
 ){
-  T = turtle3d(
-    [
-        ["arc", 40, "right", 10, "steps", 20], 
-        ["arc", 80, "right", 30, "grow", 1.1, "steps", 20], 
-        ["arc", 140, "right", 60, "shrink", 1.5, "steps", 100],
-        ["arc", 90, "right", 20, "shrink", 2, "steps", 100],
-        ["arc", 90, "right", 5, "shrink", 2.4, "steps", 100],
-        ["arc", 20, "right", 10, "shrink", 10, "steps", 100]
-    ],
-    state=RIGHT,
-    transforms=true
-  );
 
   blade_poly = blade_outline(
     bevel_len=bevel_len,
@@ -184,7 +176,18 @@ module blade_half(
   translate([0, -total_width/2, thickness/2])
   sweep(
     polygon_parts(blade_poly),
-    T
+    turtle3d(
+      [
+          ["arc", 40, "right", 10, "steps", 20],
+          ["arc", 80, "right", 30, "grow", 1.1, "steps", 20],
+          ["arc", 140, "right", 60, "shrink", 1.5, "steps", 100],
+          ["arc", 90, "right", 20, "shrink", 2, "steps", 100],
+          ["arc", 90, "right", 5, "shrink", 2.4, "steps", 100],
+          ["arc", 20, "right", 10, "shrink", 10, "steps", 100]
+      ],
+      state=RIGHT,
+      transforms=true
+    )
   );
 }
 
@@ -192,27 +195,45 @@ module dagger_half(
   handle_len=inch_to_mm(4.5),
   handle_diam=inch_to_mm(1),
   guard_angle=25,
-  blade_thickness=10,
-  blade_cheek_width=10,
+  blade_thickness=inch_to_mm(0.62),
+  blade_cheek_width=12,
   blade_bevel_len=20,
-  male=false
+  male=false,
+  explode=0,
 ) {
-  rotate([0,90,0])
-  handle_half(
-    length=handle_len,
-    diam=handle_diam,
-    guard_angle=guard_angle,
-    male=male
-  );
-
-
+  blade_void_mult = 1.05;
   total_blade_width = blade_cheek_width + 
     sqrt(pow(blade_bevel_len, 2) - 
     0.25*pow(blade_thickness, 2));
+
+  difference() {
+    rotate([0,90,0])
+    handle_half(
+      length=handle_len,
+      diam=handle_diam,
+      guard_angle=guard_angle,
+      male=male
+    );
+
+    rotate([0,0,-guard_angle])
+    // NOTE These translate numbers are bullshit
+    translate([
+      handle_len/2,
+      (total_blade_width + blade_cheek_width)/2,
+      0
+    ])
+    blade_half(
+      thickness=blade_thickness*blade_void_mult,
+      cheek_width=blade_cheek_width*blade_void_mult,
+      bevel_len=blade_bevel_len*blade_void_mult
+    );
+  }
+
+  split = explode*30;
   rotate([0,0,-guard_angle])
   // NOTE These translate numbers are bullshit
   translate([
-    handle_len/2,
+    handle_len/2 + split,
     (total_blade_width + blade_cheek_width)/2,
     0
   ])
@@ -225,16 +246,17 @@ module dagger_half(
 
 module double_dagger(
   handle_len=inch_to_mm(4.5),
-  handle_diam=inch_to_mm(1.5),
+  handle_diam=inch_to_mm(1),
   explode=0
 ) {
-  split = explode * 80;
+  split = explode * 50;
   
   translate([split, 0, 0])
   dagger_half(
     handle_len=handle_len,
     handle_diam=handle_diam,
-    male=false
+    male=false,
+    explode=explode
   );
 
   translate([-split, 0, 0])
@@ -242,7 +264,8 @@ module double_dagger(
   dagger_half(
     handle_len=handle_len,
     handle_diam=handle_diam,
-    male=true
+    male=true,
+    explode=explode
   );
 }
 
